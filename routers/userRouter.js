@@ -13,8 +13,8 @@ userRouter.post(
         db('user').where('phone_number', phoneNumber).select('id')
         .then(user => {
             user.length
-            ? res.status(400).send("user already exists with the number!")
-            : res.status(200).send("enter otp");
+            ? res.status(400).send({err:"user already exists with the number!"})
+            : res.status(200).send({message:"enter otp"});
         })
         .catch(err => res.status(500).send("db error"))
         
@@ -46,7 +46,10 @@ userRouter.post(
         : res.status(401).send("invalid otp");
     }))
 
-userRouter.get('/auth/', userJwt, expressAsyncHandler(async (req, res, next) => {
+userRouter.get(
+    '/auth/', 
+    userJwt, 
+    expressAsyncHandler(async (req, res, next) => {
     try {
         await db('user').where('id', req.user.id).select('phone_number')
         .then(user => {
@@ -63,7 +66,6 @@ userRouter.get('/auth/', userJwt, expressAsyncHandler(async (req, res, next) => 
         })
         
     } catch (error) {
-        console.log(error)
         res.status(500).send({
             success:false,
             msg:'Server error'
@@ -129,7 +131,6 @@ userRouter.get(
             })
             
         } catch (error) {
-            console.log(error)
             res.status(500).send({
                 success:false,
                 msg:'Server error'
@@ -185,5 +186,108 @@ userRouter.put(
         
     })
 )
+
+
+userRouter.post(
+    '/:id/address/',
+    userJwt,
+    expressAsyncHandler(async (req, res) => {
+        const { 
+            addressLine1, 
+            addressLine2,
+            city,
+            postalCode,
+            country,
+            phoneNumber  
+        } = req.body;
+        try {
+            await db('user_address')
+            .insert({
+                'user_id': req.user.id, 
+                'address_line1':addressLine1,
+                'address_line2':addressLine2,
+                'postal_code':postalCode,
+                'phone_number':phoneNumber,
+                country,
+                city,
+            }).then((address) => {
+                res.status(201).send({
+                    success: true,
+                    msg: "added new address",
+                })
+            }).catch(err => {
+                res.status(400).send({
+                    success: true,
+                    msg: err
+                })
+            })
+        } catch (error) {
+            res.status(500).send({
+                success:false,
+                msg:'server error'
+            })
+        }
+    }))
+
+userRouter.get(
+    '/:id/address/',
+    userJwt,
+    expressAsyncHandler(async (req, res) => {
+        try {
+            await db('user_address')
+            .where('user_id', '=', req.params.id)
+            .select('*')
+            .then(address => {
+                res.status(200).send({
+                    success:true,
+                    msg:address
+                })
+            })
+            .catch(err => {
+                res.status(400).send({
+                    success:false,
+                    msg:'db error'
+                })
+            })
+        } catch (error) {
+            res.status(500).send({
+                success:false,
+                msg:'user not found db error'
+            })
+        }
+    })
+)
+
+
+userRouter.get(
+    '/:id/address/:address_id/',
+    userJwt,
+    expressAsyncHandler(async (req, res) => {
+        try {
+            await db('user_address')
+            .where('id', '=', req.params.address_id)
+            .select('*')
+            .then(address => {
+                res.status(200).send({
+                    success:true,
+                    msg:address
+                })
+            })
+            .catch(err => {
+                res.status(400).send({
+                    success:false,
+                    msg:'db error'
+                })
+            })
+        } catch (error) {
+            res.status(500).send({
+                success:false,
+                msg:'user not found db error'
+            })
+        }
+    })
+)
+
+
 
 export default  userRouter;
