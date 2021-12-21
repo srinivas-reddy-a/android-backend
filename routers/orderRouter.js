@@ -22,18 +22,18 @@ orderRouter.post(
             }).then(order => {
                 res.status(201).send({
                     success:true,
-                    msg:order
+                    order:order
                 })
             }).catch(err => {
                 res.status(400).send({
                     success:false,
-                    msg: err
+                    message: err
                 })
             })
         } catch (error) {
             res.status(500).send({
                 success:false,
-                msg:'user not found db error'
+                message:'user not found db error'
             })
         }
     })
@@ -57,18 +57,18 @@ orderRouter.post(
             }).then(order => {
                 res.status(201).send({
                     success:true,
-                    msg:"order placed"
+                    message:"order placed"
                 })
             }).catch(err => {
                 res.status(400).send({
                     success:false,
-                    msg: "db error"
+                    message: "db error"
                 })
             })
         } catch (error) {
             res.status(500).send({
                 success:false,
-                msg:'user not found db error'
+                message:'user not found db error'
             })
         }
     })
@@ -85,18 +85,18 @@ orderRouter.get(
             .then(order => {
                 res.status(200).send({
                     success:true,
-                    msg:order
+                    order:order
                 })
             }).catch(err => {
                 res.status(400).send({
                     success:false,
-                    msg:"db error!"
+                    message:"db error!"
                 })
             })
         } catch (error) {
             res.status(500).send({
                 success:false,
-                msg:"server error!"
+                message:"server error!"
             })
         }
     })
@@ -112,18 +112,18 @@ orderRouter.get(
             .then(order => {
                 res.status(200).send({
                     success:true,
-                    msg:order
+                    order:order
                 })
             }).catch(err => {
                 res.status(400).send({
                     success:false,
-                    msg:"db error!"
+                    message:"db error!"
                 })
             })
         } catch (error) {
             res.status(500).send({
                 success:false,
-                msg:"server error!"
+                message:"server error!"
             })
         }
     })
@@ -140,18 +140,18 @@ orderRouter.get(
             .then(order => {
                 res.status(200).send({
                     success:true,
-                    msg:order
+                    order:order
                 })
             }).catch(err => {
                 res.status(400).send({
                     success:false,
-                    msg:"db error!"
+                    message:"db error!"
                 })
             })
         } catch (error) {
             res.status(500).send({
                 success:false,
-                msg:"server error!"
+                message:"server error!"
             })
         }
     })

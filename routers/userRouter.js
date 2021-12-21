@@ -13,10 +13,21 @@ userRouter.post(
         db('user').where('phone_number', phoneNumber).select('id')
         .then(user => {
             user.length
-            ? res.status(400).send({err:"user already exists with the number!"})
-            : res.status(200).send({message:"enter otp"});
+            ? res.status(400).send({
+                success:false,
+                err:"user already exists with the number!"
+            })
+            : res.status(200).send({
+                success:true,
+                message:"enter otp"}
+                );
         })
-        .catch(err => res.status(500).send("db error"))
+        .catch(err => {
+            res.status(500).send({
+                success:false,
+                message:"data error"
+            })
+        })
         
 }))
 
@@ -43,7 +54,10 @@ userRouter.post(
             })
         })
         .catch(err => res.status(400).send("db error"))
-        : res.status(401).send("invalid otp");
+        : res.status(401).send({
+            success:false,
+            message:"invalid otp"
+        });
     }))
 
 userRouter.get(
@@ -61,14 +75,14 @@ userRouter.get(
         .catch(err => {
             res.status(500).send({
                 success:false,
-                msg:'user not found db error'
+                message:'user not found db error'
             })
         })
         
     } catch (error) {
         res.status(500).send({
             success:false,
-            msg:'Server error'
+            message:'Server error'
         })
         next()
     }
@@ -83,7 +97,10 @@ userRouter.post('/login/', expressAsyncHandler(async (req, res) => {
             ? res.status(200).send("enter otp")
             : res.status(400).send("User not registered! Go register");
         })
-        .catch(err => res.status(500).send("db error"))
+        .catch(err => res.status(500).send({
+            success:true,
+            message:"db error"
+        }))
 }))
     
 userRouter.post(
@@ -103,11 +120,13 @@ userRouter.post(
                 res.status(200).send({
                     success: true,
                     token: token,
-                    msg: "loged in!"
                 })
             })
         }else{
-            res.status(401).send("invalid otp");
+            res.status(401).send({
+                success: false,
+                message: "invalid otp"
+            });
         } 
     }))
 
@@ -126,14 +145,14 @@ userRouter.get(
             .catch(err => {
                 res.status(500).send({
                     success:false,
-                    msg:'user not found db error'
+                    message:'user not found db error'
                 })
             })
             
         } catch (error) {
             res.status(500).send({
                 success:false,
-                msg:'Server error'
+                message:'Server error'
             })
             
         }
