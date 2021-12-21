@@ -25,7 +25,7 @@ productRouter.get(
 
 
 productRouter.get(
-    '/categories/',
+    '/category/',
     expressAsyncHandler(async (req, res) => {
         try {
             await db
