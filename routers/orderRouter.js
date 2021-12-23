@@ -12,7 +12,7 @@ orderRouter.post(
         const {
             total,
             address_id,
-        } = req.body
+        } = req.body;
         try {
             await db('order')
             .insert({
@@ -27,13 +27,13 @@ orderRouter.post(
             }).catch(err => {
                 res.status(400).send({
                     success:false,
-                    message: err
+                    message: "db error"
                 })
             })
         } catch (error) {
             res.status(500).send({
                 success:false,
-                message:'user not found db error'
+                message:'server error'
             })
         }
     })

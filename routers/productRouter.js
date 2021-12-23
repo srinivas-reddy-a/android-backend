@@ -17,9 +17,15 @@ productRouter.get(
                     products:products
                 })
             })
-            .catch(err => res.status(400).send('db error'))
+            .catch(err => res.status(400).send({
+                success:false,
+                message:"db error"
+            }))
         } catch (error) {
-            res.status(500).send('server error')
+            res.status(500).send({
+                success:false,
+                message:"server error"
+            })
         }
     }))
 
@@ -37,9 +43,15 @@ productRouter.get(
                     products:categories
                 })
             })
-            .catch(err => res.status(400).send('db error'))
+            .catch(err => res.status(400).send({
+                success:false,
+                message:"db error"
+            }))
         } catch (error) {
-            res.status(500).send('server error')
+            res.status(500).send({
+                success:false,
+                message:"server error"
+            })
         }
     }))
 
@@ -58,7 +70,7 @@ productRouter.get(
             .catch(err => {
                 res.status(500).send({
                     success:false,
-                    msg:'product not found db error'
+                    message:'product not found db error'
                 })
             })
             
@@ -66,7 +78,7 @@ productRouter.get(
             console.log(error)
             res.status(500).send({
                 success:false,
-                msg:'Server error'
+                message:'Server error'
             })
             
         }
@@ -88,7 +100,7 @@ productRouter.get(
             .catch(err => {
                 res.status(500).send({
                     success:false,
-                    msg:'category not found db error'
+                    message:'category not found db error'
                 })
             })
             
@@ -96,7 +108,7 @@ productRouter.get(
             console.log(error)
             res.status(500).send({
                 success:false,
-                msg:'Server error'
+                message:'Server error'
             })
             
         }
@@ -113,16 +125,19 @@ productRouter.post(
             .then(() => {
                 res.status(201).send({
                     success:true,
-                    msg: "review added"
+                    message: "review added"
                 })
             })
             .catch(errr => {
-                res.status(400).send("db error")
+                res.status(400).send({
+                    success:false,
+                    message:"db error"
+                })
             })
         } catch (error) {
             res.status(500).send({
                 success:false,
-                msg:'Server error'
+                message:'Server error'
             })
         }
     })
