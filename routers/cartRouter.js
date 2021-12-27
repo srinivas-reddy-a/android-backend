@@ -4,7 +4,7 @@ import db from "../config/database.js";
 import userJwt from "../middleware/userMiddleware.js";
 
 const cartRouter = express.Router();
-
+//to add items
 cartRouter.post(
     '/',
     userJwt,
