@@ -261,7 +261,7 @@ userRouter.get(
             .then(address => {
                 res.status(200).send({
                     success:true,
-                    msg:address
+                    address:address
                 })
             })
             .catch(err => {
@@ -279,7 +279,7 @@ userRouter.get(
     })
 )
 
-
+//to retrieve individual address
 userRouter.get(
     '/address/:id/',
     userJwt,
@@ -291,7 +291,7 @@ userRouter.get(
             .then(address => {
                 res.status(200).send({
                     success:true,
-                    msg:address
+                    address:address
                 })
             })
             .catch(err => {
