@@ -40,7 +40,7 @@ productRouter.get(
             .then(categories => {
                 res.status(200).send({
                     success:true,
-                    products:categories
+                    categories:categories
                 })
             })
             .catch(err => res.status(400).send({

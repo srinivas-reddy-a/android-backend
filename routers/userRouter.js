@@ -256,7 +256,7 @@ userRouter.get(
     expressAsyncHandler(async (req, res) => {
         try {
             await db('user_address')
-            .where('user_id', '=', req.params.id)
+            .where('user_id', '=', req.user.id)
             .select('*')
             .then(address => {
                 res.status(200).send({
