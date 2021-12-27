@@ -3,9 +3,9 @@ import expressAsyncHandler from "express-async-handler";
 import db from "../config/database.js";
 import userJwt from "../middleware/userMiddleware.js";
 
-const cartRouter = express.Router();
+const wishList = express.Router();
 
-cartRouter.post(
+wishList.post(
     '',
     userJwt,
     expressAsyncHandler(async (req, res) => {
@@ -14,10 +14,10 @@ cartRouter.post(
             quantity
         }  = req.body;
         try {
-            await db('cart')
+            await db('wish_list')
             .insert({
-                usersz_id:req.body.id,
-                product_id,
+                userszs:req.user.id,
+                productszs_id:product_id,
                 quantity,
             }).then(product => {
                 res.status(201).send({
@@ -39,13 +39,13 @@ cartRouter.post(
     })
 )
 
-cartRouter.get(
+wishList.get(
     '',
     userJwt,
     expressAsyncHandler(async (req, res) => {
         try {
-            await db('cart')
-            .where('usersz_id', '=', req.user.id)
+            await db('wish_list')
+            .where('userszs_id', '=', req.user.id)
             .select('*')
             .then(products => {
                 res.status(200).send({
@@ -67,7 +67,7 @@ cartRouter.get(
     })
 )
 
-cartRouter.put(
+wishList.put(
     '',
     userJwt,
     expressAsyncHandler(async (req, res) =>{
@@ -77,18 +77,18 @@ cartRouter.put(
         }  = req.body;
         try {
             await db.transaction(trx => {
-                return trx('cart')
+                return trx('wish_list')
                     .where({
-                        usersz_id: req.user.id,
-                        product_id: product_id
+                        userszs_id: req.user.id,
+                        productszs_id: product_id
                     }).then(product => {
                         if(product.length){
                             product = product[0];
                             product.quantity = quantity;
-                            return trx('cart')
+                            return trx('wish_list')
                             .where({
-                                usersz_id: req.user.id,
-                                product_id: product_id
+                                userszs_id: req.user.id,
+                                productszs_id: product_id
                             }).update({
                                 quantity:quantity
                             }).then(product => {
@@ -118,15 +118,15 @@ cartRouter.put(
     })
 )
 
-cartRouter.delete(
+wishList.delete(
     '',
     userJwt,
     expressAsyncHandler(async (req, res) => {
         try {
             await db('cart')
             .where({
-                usersz_id: req.user.id,
-                product_id: product_id
+                userszs_id: req.user.id,
+                productszs_id: product_id
             }).del()
             .then(() => {
                 res.status(200).send({
