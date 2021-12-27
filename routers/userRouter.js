@@ -7,7 +7,7 @@ import userJwt from "../middleware/userMiddleware.js";
 
 const userRouter = express.Router();
 userRouter.post(
-    '/register/', 
+    'register/', 
     expressAsyncHandler(async (req, res) => {
         const { phoneNumber} = req.body;
         db('user').where('phone_number', phoneNumber).select('id')
@@ -32,15 +32,15 @@ userRouter.post(
 }))
 
 userRouter.post(
-    '/register/otp/',
+    'register/otp/',
     expressAsyncHandler(async (req, res) => {
         const { phoneNumber,otp } = req.body;
         otp==1234
-        ? db('user').insert({'id':1001, 'phone_number':phoneNumber})
+        ? db('user').insert({'phone_number':phoneNumber})
         .then(user => {
             const payload = {
                 user: {
-                    id: 1001
+                    id: user[0]
                 }
             }
             jwt.sign(payload, "jwtsecret", {
@@ -61,7 +61,7 @@ userRouter.post(
     }))
 
 userRouter.get(
-    '/auth/', 
+    'auth/', 
     userJwt, 
     expressAsyncHandler(async (req, res, next) => {
     try {
@@ -88,7 +88,9 @@ userRouter.get(
     }
 }))
 
-userRouter.post('/login/', expressAsyncHandler(async (req, res) => {
+userRouter.post(
+    'login/', 
+    expressAsyncHandler(async (req, res) => {
     const phoneNumber = req.body.phoneNumber;
     
     db('user').where('phone_number', phoneNumber).select('id')
@@ -104,7 +106,7 @@ userRouter.post('/login/', expressAsyncHandler(async (req, res) => {
 }))
     
 userRouter.post(
-    '/login/otp/',
+    'login/otp/',
     expressAsyncHandler(async (req, res) => {
         const { otp } = req.body;
         if(otp==1234){
@@ -131,7 +133,7 @@ userRouter.post(
     }))
 
 userRouter.get(
-    '/:id',
+    '',
     userJwt,
     expressAsyncHandler(async (req, res) => {
         try {
@@ -163,7 +165,7 @@ userRouter.put(
     '',
     userJwt,
     expressAsyncHandler(async (req, res) => {
-        db.transaction(trx => {
+        await db.transaction(trx => {
             return trx('user')
             .where('id', req.user.id)
             .then(user => {
@@ -208,7 +210,7 @@ userRouter.put(
 
 
 userRouter.post(
-    '/:id/address/',
+    'address/',
     userJwt,
     expressAsyncHandler(async (req, res) => {
         const { 
@@ -249,7 +251,7 @@ userRouter.post(
     }))
 
 userRouter.get(
-    '/:id/address/',
+    'address/',
     userJwt,
     expressAsyncHandler(async (req, res) => {
         try {
@@ -279,12 +281,12 @@ userRouter.get(
 
 
 userRouter.get(
-    '/:id/address/:address_id/',
+    'address/:id/',
     userJwt,
     expressAsyncHandler(async (req, res) => {
         try {
             await db('user_address')
-            .where('id', '=', req.params.address_id)
+            .where('id', '=', req.params.id)
             .select('*')
             .then(address => {
                 res.status(200).send({

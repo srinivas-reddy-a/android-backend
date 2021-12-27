@@ -6,7 +6,7 @@ import userJwt from "../middleware/userMiddleware.js";
 const orderRouter = express.Router();
 
 orderRouter.post(
-    '/',
+    '',
     userJwt,
     expressAsyncHandler(async (req,res) => {
         const {
@@ -41,7 +41,7 @@ orderRouter.post(
 
 
 orderRouter.post(
-    '/detail/',
+    'detail/',
     expressAsyncHandler(async (req, res) => {
         const {
             order_id,
@@ -74,6 +74,7 @@ orderRouter.post(
     })
 )
 
+//order id in url
 orderRouter.get(
     '/:id/',
     userJwt,
