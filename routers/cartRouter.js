@@ -6,7 +6,7 @@ import userJwt from "../middleware/userMiddleware.js";
 const cartRouter = express.Router();
 
 cartRouter.post(
-    '',
+    '/',
     userJwt,
     expressAsyncHandler(async (req, res) => {
         const {
@@ -40,7 +40,7 @@ cartRouter.post(
 )
 
 cartRouter.get(
-    '',
+    '/',
     userJwt,
     expressAsyncHandler(async (req, res) => {
         try {
@@ -68,7 +68,7 @@ cartRouter.get(
 )
 
 cartRouter.put(
-    '',
+    '/',
     userJwt,
     expressAsyncHandler(async (req, res) =>{
         const {
@@ -119,7 +119,7 @@ cartRouter.put(
 )
 
 cartRouter.delete(
-    '',
+    '/',
     userJwt,
     expressAsyncHandler(async (req, res) => {
         try {
@@ -147,3 +147,5 @@ cartRouter.delete(
         }
     })
 )
+
+export default cartRouter;

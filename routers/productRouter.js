@@ -5,7 +5,7 @@ import db from "../config/database.js";
 const productRouter = express.Router();
 
 productRouter.get(
-    '',
+    '/',
     expressAsyncHandler(async (req, res) => {
         try {
             await db
@@ -31,7 +31,7 @@ productRouter.get(
 
 
 productRouter.get(
-    'category/',
+    '/category/',
     expressAsyncHandler(async (req, res) => {
         try {
             await db
@@ -57,7 +57,7 @@ productRouter.get(
 
 
 productRouter.get(
-    ':id/',
+    '/:id/',
     expressAsyncHandler(async (req,res) => {
         try {
             await db('product').where('id', req.params.id).select('*')
@@ -87,7 +87,7 @@ productRouter.get(
 
 
 productRouter.get(
-    'category/:id/',
+    '/category/:id/',
     expressAsyncHandler(async (req,res) => {
         try {
             await db('category').where('id', req.params.id).select('*')
@@ -116,7 +116,7 @@ productRouter.get(
 )
 
 productRouter.post(
-    ':id/review/',
+    '/:id/review/',
     expressAsyncHandler(async (req, res) => {
         const { rating, comment } = req.body;
         try {
