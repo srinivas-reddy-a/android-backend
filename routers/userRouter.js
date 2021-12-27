@@ -214,6 +214,7 @@ userRouter.post(
     userJwt,
     expressAsyncHandler(async (req, res) => {
         const { 
+            address_name,
             addressLine1, 
             addressLine2,
             city,
@@ -224,6 +225,7 @@ userRouter.post(
         try {
             await db('user_address')
             .insert({
+                address_name,
                 'user_id': req.user.id, 
                 'address_line1':addressLine1,
                 'address_line2':addressLine2,
