@@ -311,4 +311,8 @@ userRouter.get(
     })
 )
 
+userRouter.put(
+    '/address/'
+)
+
 export default  userRouter;

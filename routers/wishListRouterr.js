@@ -3,10 +3,10 @@ import expressAsyncHandler from "express-async-handler";
 import db from "../config/database.js";
 import userJwt from "../middleware/userMiddleware.js";
 
-const wishList = express.Router();
+const wishListRouter = express.Router();
 
-wishList.post(
-    '',
+wishListRouter.post(
+    '/',
     userJwt,
     expressAsyncHandler(async (req, res) => {
         const {
@@ -39,8 +39,8 @@ wishList.post(
     })
 )
 
-wishList.get(
-    '',
+wishListRouter.get(
+    '/',
     userJwt,
     expressAsyncHandler(async (req, res) => {
         try {
@@ -67,8 +67,8 @@ wishList.get(
     })
 )
 
-wishList.put(
-    '',
+wishListRouter.put(
+    '/',
     userJwt,
     expressAsyncHandler(async (req, res) =>{
         const {
@@ -118,8 +118,8 @@ wishList.put(
     })
 )
 
-wishList.delete(
-    '',
+wishListRouter.delete(
+    '/',
     userJwt,
     expressAsyncHandler(async (req, res) => {
         try {
@@ -147,3 +147,5 @@ wishList.delete(
         }
     })
 )
+
+export default wishListRouter
