@@ -219,8 +219,9 @@ userRouter.post(
             addressLine2,
             city,
             postalCode,
-            country,
-            phoneNumber  
+            state,
+            phoneNumber,
+            alternate_number
         } = req.body;
         try {
             await db('user_address')
@@ -231,8 +232,9 @@ userRouter.post(
                 'address_line2':addressLine2,
                 'postal_code':postalCode,
                 'phone_number':phoneNumber,
-                country,
+                state,
                 city,
+                alternate_number
             }).then((address) => {
                 res.status(201).send({
                     success: true,
@@ -309,10 +311,6 @@ userRouter.get(
             })
         }
     })
-)
-
-userRouter.put(
-    '/address/'
 )
 
 export default  userRouter;

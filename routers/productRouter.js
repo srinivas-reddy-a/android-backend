@@ -7,10 +7,12 @@ const productRouter = express.Router();
 productRouter.get(
     '/',
     expressAsyncHandler(async (req, res) => {
+        // if(Object.keys(req.query).length!=0){
+        //     console.log(req.query);
+        // }
         try {
-            await db
-            .select()
-            .table('product')
+            await db('product')
+            .orderBy(req.query.params || 'name', 'desc')
             .then(products => {
                 res.status(200).send({
                     success:true,
