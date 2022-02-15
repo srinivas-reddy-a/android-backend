@@ -27,7 +27,12 @@ productRouter.get(
                 if(req.query.brand){
                     qb.where('brand', 'like', `%${req.query.brand}%`)
                 }
-
+                if(req.query.price){
+                    qb.where('price', '<=', req.query.price)
+                }
+                if(req.query.disease){
+                    qb.where('target_disease', 'like', `%${req.query.disease}%`)
+                }
             })
             .orderBy('name', 'asc')
             .then(products => {
