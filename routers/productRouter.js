@@ -94,7 +94,9 @@ productRouter.get(
     '/:id/',
     expressAsyncHandler(async (req,res) => {
         try {
-            await db('product').where('id', req.params.id).select('*')
+            await db('product')
+            .where('id', req.params.id)
+            .select('*')
             .then(product => {
                 res.status(200).send({
                     success:true,

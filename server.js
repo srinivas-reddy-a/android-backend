@@ -4,13 +4,13 @@ import productRouter from "./routers/productRouter.js";
 import orderRouter from "./routers/orderRouter.js";
 import cartRouter from "./routers/cartRouter.js";
 import wishListRouter from "./routers/wishListRouterr.js";
-
+import brandRouter from "./routers/brandRounter.js";
 const PORT = process.env.PORT || 3000;
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
 
-
+app.use('/api/brand/', brandRouter);
 app.use('/api/user/', userRouter);
 app.use('/api/product/', productRouter);
 app.use('/api/order/', orderRouter);
