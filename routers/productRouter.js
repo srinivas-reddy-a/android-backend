@@ -1,5 +1,6 @@
 import express from "express";
 import expressAsyncHandler from "express-async-handler";
+import knex from "knex";
 import db from "../config/database.js";
 
 const productRouter = express.Router();
@@ -7,12 +8,28 @@ const productRouter = express.Router();
 productRouter.get(
     '/',
     expressAsyncHandler(async (req, res) => {
-        // if(Object.keys(req.query).length!=0){
-        //     console.log(req.query);
-        // }
+
         try {
             await db('product')
-            .orderBy(req.query.params || 'name', 'desc')
+            .where((qb)=>{
+                if(req.query.name){
+                    qb.where('name', 'like', `%${req.query.name}%`)
+                }
+                if(req.query.category){
+                    qb.where('category_id', '=', req.query.category)
+                }                
+                if(req.query.crop){
+                    qb.where('target_field_crops', 'like', `%${req.query.crop}%`)
+                    .orWhere('target_vegetable_crops', 'like', `%${req.query.crop}%`)
+                    .orWhere('target_fruit_crops', 'like', `%${req.query.crop}%`)
+                    .orWhere('target_plantation_crops', 'like', `%${req.query.crop}%`)
+                }
+                if(req.query.brand){
+                    qb.where('brand', 'like', `%${req.query.brand}%`)
+                }
+
+            })
+            .orderBy('name', 'asc')
             .then(products => {
                 res.status(200).send({
                     success:true,
@@ -77,7 +94,6 @@ productRouter.get(
             })
             
         } catch (error) {
-            console.log(error)
             res.status(500).send({
                 success:false,
                 message:'Server error'
@@ -107,7 +123,6 @@ productRouter.get(
             })
             
         } catch (error) {
-            console.log(error)
             res.status(500).send({
                 success:false,
                 message:'Server error'
