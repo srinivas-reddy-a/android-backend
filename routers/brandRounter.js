@@ -56,3 +56,5 @@ brandRouter.get(
         }
     })
 )
+
+export default brandRouter;
