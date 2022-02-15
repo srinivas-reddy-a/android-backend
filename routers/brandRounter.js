@@ -8,17 +8,18 @@ brandRouter.get(
     '/',
     expressAsyncHandler(async (req, res) => {
         try{
-            await db('brand')
+            await db
             .select()
+            .table('brand')
             .then(brands => {
-                res.status(200)({
+                res.status(200).send({
                     success:true,
                     brands:brands
                 })
             })
             .catch(err => res.status(400).send({
                 success:false,
-                message:"db error"
+                message:err
             }))
         } catch (error) {
             res.status(500).send({
