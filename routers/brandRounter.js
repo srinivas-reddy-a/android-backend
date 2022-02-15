@@ -1,6 +1,6 @@
 import express from "express";
 import expressAsyncHandler from "express-async-handler";
-import db from "../config/database";
+import db from "../config/database.js";
 
 const brandRouter = express.Router();
 
