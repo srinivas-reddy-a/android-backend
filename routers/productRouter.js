@@ -16,7 +16,7 @@ productRouter.get(
                     qb.where('name', 'like', `%${req.query.name}%`)
                 }
                 if(req.query.category){
-                    qb.where('category_id', '=', req.query.category)
+                    qb.where('category', '=', req.query.category)
                 }                
                 if(req.query.crop){
                     qb.where('target_field_crops', 'like', `%${req.query.crop}%`)
@@ -32,6 +32,16 @@ productRouter.get(
                 }
                 if(req.query.disease){
                     qb.where('target_disease', 'like', `%${req.query.disease}%`)
+                }
+                if(req.query.search){
+                    qb.where('target_field_crops', 'like', `%${req.query.search}%`)
+                    .orWhere('target_vegetable_crops', 'like', `%${req.query.search}%`)
+                    .orWhere('target_fruit_crops', 'like', `%${req.query.search}%`)
+                    .orWhere('target_plantation_crops', 'like', `%${req.query.search}%`)
+                    .orWhere('name', 'like', `%${req.query.search}%`)
+                    .orWhere('brand', 'like', `%${req.query.search}%`)
+                    .orWhere('target_disease', 'like', `%${req.query.search}%`)
+                    .orWhere('category', 'like', `%${req.query.search}%`)
                 }
             })
             .orderBy('name', 'asc')
