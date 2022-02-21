@@ -468,11 +468,11 @@ userRouter.put(
 )
 
 userRouter.delete(
-    '/address/',
+    '/address/:id/',
     userJwt,
     expressAsyncHandler(async (req, res)=>{
         try {
-            const { id } = req.body;
+            const { id } = req.params.id;
             await db('user_address')
             .where({
                 id:id
