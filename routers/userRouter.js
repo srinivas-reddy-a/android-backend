@@ -415,7 +415,7 @@ userRouter.put(
         try {
             const {id} = req.body;
             await db.transaction(async trx => {
-                return trx('user')
+                return trx('user_address')
                 .where({
                     id:id
                 }).then(async address => {
@@ -451,7 +451,7 @@ userRouter.put(
                         }).catch(err => {
                             res.status(400).send({
                                 success:false,
-                                msg: "No such user/product exists!"
+                                msg: "No such user/address exists!"
                             })
                         })
                     }
@@ -495,5 +495,49 @@ userRouter.delete(
         }
     })
 )
-
+userRouter.put(
+    '/address/default/',
+    userJwt,
+    expressAsyncHandler(async (req, res) => {
+        const{ id } = req.body;
+        try {
+            await db.transaction(async trx => {
+                return trx('user_address')
+                .where({
+                    user_id:req.user.id,
+                    is_default:1
+                }).update({
+                    is_default:0
+                }).then(async (address) => {
+                    return trx('user_address')
+                    .where({
+                        id:id
+                    }).update({
+                        'is_default':1
+                    }).then((address) => {
+                        res.status(200).send({
+                            success:true,
+                            address:address
+                        })
+                    }).catch(err => {
+                        res.status(400).send({
+                            success:false,
+                            msg: "No such user/address exists!"
+                        })
+                    })
+                }).catch(err => {
+                    res.status(400).send({
+                        success:false,
+                        msg: "No such user exists!"
+                    })
+                })
+            })
+        } catch (error) {
+            res.status(500).send({
+                success:false,
+                message:'Server error'
+            })
+        }
+    })
+)
 export default  userRouter;
