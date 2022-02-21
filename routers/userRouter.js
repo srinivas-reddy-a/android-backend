@@ -82,12 +82,37 @@ userRouter.post(
         }
     }))
 
+userRouter.post(
+    '/token/',
+    expressAsyncHandler(async (req, res) =>{
+        try {
+            const payload = {
+                user: {
+                    id: 1
+                }
+            }
+            jwt.sign(payload, "jwtsecret", 
+                (err, token) => {
+                    res.status(200).send({
+                        success:true,
+                        token:token
+                    })
+                })
+        } catch (error) {
+            res.status(401).send({
+                success:false,
+                message:"internal error"
+            });
+        }
+    })
+)
+
 userRouter.get(
     '/auth/', 
     userJwt, 
     expressAsyncHandler(async (req, res, next) => {
     try {
-        await db('user').where('id', req.user.id).select('phone_number')
+        await db('user').where('id', req.user.id).select('*')
         .then(user => {
             res.status(200).send({
                 success:true,
@@ -233,10 +258,10 @@ userRouter.put(
     '/',
     userJwt,
     expressAsyncHandler(async (req, res) => {
-        await db.transaction(trx => {
+        await db.transaction(async trx => {
             return trx('user')
             .where('id', req.user.id)
-            .then(user => {
+            .then(async user => {
                 if(user.length){
                     user = user[0]; 
                     user.phone_number= req.body.phoneNumber || user.phone_number;
@@ -250,7 +275,7 @@ userRouter.put(
                         email: user.email,
                         name: user.name,
 
-                    }).then(() => {
+                    }).then((user) => {
                         
                         res.status(201).send({
                             success: true,
@@ -289,7 +314,8 @@ userRouter.post(
             postalCode,
             state,
             phoneNumber,
-            alternate_number
+            alternate_number,
+            is_default,
         } = req.body;
         try {
             await db('user_address')
@@ -302,7 +328,8 @@ userRouter.post(
                 'phone_number':phoneNumber,
                 state,
                 city,
-                alternate_number
+                alternate_number,
+                is_default
             }).then((address) => {
                 res.status(201).send({
                     success: true,
@@ -377,6 +404,56 @@ userRouter.get(
                 success:false,
                 msg:'user not found db error'
             })
+        }
+    })
+)
+
+userRouter.put(
+    '',
+    userJwt,
+    expressAsyncHandler(async (req, res) => {
+        try {
+            const {id} = req.body;
+            await db.transaction(async trx => {
+                return trx('user')
+                .where({
+                    id:id
+                }).then(async address => {
+                    if(address.length){
+                        address=address[0];
+                        address.address_name= req.body.address_name || address.address_name;
+                        address.addressLine1 = req.body.addressLine1 || address.addressLine1;
+                        address.addressLine2 = req.body.addressLine2 || address.addressLine2;
+                        address.city = req.body.city || address.city;
+                        address.postal_code = req.body.postal_code || address.postal_code;
+                        address.state = req.body.state || address.state;
+                        address.phone_number = req.body.phone_number || address.phone_number;
+                        address.alternate_number = req.body.alternate_number || address.alternate_number;
+                        address.is_default = req.body.is_default || address.is_default;
+                        return trx('user_address')
+                        .where({
+                            id:id
+                        }).update({
+                            'address_name':address.address_name,
+                            'address_line1':address.addressLine1,
+                            'address_line2':address.addressLine2,
+                            'postal_code':address.postalCode,
+                            'phone_number':address.phoneNumber,
+                            'state':address.state,
+                            'city':address.city,
+                            'alternate_number':address.alternate_number,
+                            'is_default':address.is_default
+                        }).then((address)=>{
+                            res.status(200).send({
+                                success:true,
+                                address:address
+                            })
+                        })
+                    }
+                })
+            })
+        } catch (error) {
+            
         }
     })
 )
