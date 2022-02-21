@@ -35,29 +35,51 @@ userRouter.post(
     '/register/otp/',
     expressAsyncHandler(async (req, res) => {
         const { phoneNumber,otp } = req.body;
-        otp==1234
-        ? db('user').insert({'phone_number':phoneNumber})
-        .then(user => {
-            const payload = {
-                user: {
-                    id: user[0]
-                }
-            }
-            jwt.sign(payload, "jwtsecret", {
-                expiresIn:360000
-            }, (err, token) => {
-                if(err) throw err
-                res.status(200).send({
-                    success: true,
-                    token: token
+        if(otp==1234){
+            try {
+                db.select('id')
+                .from('user')
+                .orderBy('id', 'desc')
+                .limit(1)
+                .then(id => {
+                    const payload = {
+                        user: {
+                            id: id[0].id+1
+                        }
+                    }
+                    jwt.sign(payload, "jwtsecret", 
+                    (err, token) => {
+                        if(err) throw err
+                        db('user')
+                        .insert({
+                            'id':id[0].id+1,
+                            'phone_number':phoneNumber,
+                            'token':token
+                        })
+                        .then(user => {
+                            res.status(200).send({
+                                success: true,
+                                token: token
+                            })
+                        })
+                    
+                    })
                 })
-            })
-        })
-        .catch(err => res.status(400).send("db error"))
-        : res.status(401).send({
-            success:false,
-            message:"invalid otp"
-        });
+                .catch(err => res.status(400).send("db error"))
+            } catch (error) {
+                res.status(401).send({
+                    success:false,
+                    message:"internal error"
+                });
+            }
+            
+        }
+        else{
+            res.status(401).send({
+                success:false,
+                message:"invalid otp"
+            });
+        }
     }))
 
 userRouter.get(
@@ -96,7 +118,10 @@ userRouter.post(
     db('user').where('phone_number', phoneNumber).select('id')
         .then(user => {
             user.length
-            ? res.status(200).send("enter otp")
+            ? res.status(200).send({
+                id:user[0].id,
+                message:"enter otp"
+            })
             : res.status(400).send("User not registered! Go register");
         })
         .catch(err => res.status(500).send({
@@ -108,29 +133,72 @@ userRouter.post(
 userRouter.post(
     '/login/otp/',
     expressAsyncHandler(async (req, res) => {
-        const { otp } = req.body;
+        const { id, otp } = req.body;
         if(otp==1234){
-            const payload = {
-                user: {
-                    id: 1001
+            try {
+                const payload = {
+                    user: {
+                        id: id
+                    }
                 }
+                jwt.sign(payload, "jwtsecret", 
+                (err, token) => {
+                    if(err) throw err
+                    db('user')
+                    .where('id', id)
+                    .update({
+                        'token':token
+                    })
+                    .then(user => {
+                        res.status(200).send({
+                            success: true,
+                            token: token
+                        })
+                    })
+                    .catch(err => {
+                        res.status(400).send("db error")
+                    })  
+                })     
+            } catch (error) {
+                res.status(401).send({
+                    success:false,
+                    message:"internal error"
+                });
             }
-            jwt.sign(payload, "jwtsecret", {
-                expiresIn:360000
-            }, (err, token) => {
-                if(err) throw err
+            
+        }
+        else{
+            res.status(401).send({
+                success:false,
+                message:"invalid otp"
+            });
+        }
+    }))
+
+
+userRouter.post(
+    '/logout/',
+    userJwt,
+    expressAsyncHandler(async (req, res) =>{
+        try {
+            db('user')
+            .where('id', req.user.id)
+            .update({
+                'token':null
+            })
+            .then(()=>{
                 res.status(200).send({
-                    success: true,
-                    token: token,
+                    message:"Logged out!"
                 })
             })
-        }else{
-            res.status(401).send({
-                success: false,
-                message: "invalid otp"
-            });
-        } 
-    }))
+        } catch (error) {
+            res.status(500).send({
+                success:false,
+                message:'Server error'
+            })
+        }
+    })
+)
 
 userRouter.get(
     '/',

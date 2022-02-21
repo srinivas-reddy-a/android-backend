@@ -46,7 +46,6 @@ cartRouter.get(
         try {
             await db('cart')
             .where('usersz_id', '=', req.user.id)
-            .select('*')
             .then(products => {
                 res.status(200).send({
                     success:true,
@@ -76,12 +75,13 @@ cartRouter.put(
             quantity
         }  = req.body;
         try {
-            await db.transaction(trx => {
+            await db.transaction(async trx => {
                 return trx('cart')
                     .where({
                         usersz_id: req.user.id,
                         product_id: product_id
-                    }).then(product => {
+                    })
+                    .then(product => {
                         if(product.length){
                             product = product[0];
                             product.quantity = quantity;
