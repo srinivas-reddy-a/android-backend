@@ -472,7 +472,8 @@ userRouter.delete(
     userJwt,
     expressAsyncHandler(async (req, res)=>{
         try {
-            const { id } = req.params.id;
+            const id = req.params.id;
+            console.log(id)
             await db('user_address')
             .where({
                 id:id
@@ -485,7 +486,7 @@ userRouter.delete(
             }).catch(err => {
                 res.status(400).send({
                     success:false,
-                    msg: "No such user/product exists!"
+                    msg: "No such user/address exists!"
                 })
             })
         } catch (error) {
