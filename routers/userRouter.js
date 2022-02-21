@@ -447,7 +447,7 @@ userRouter.put(
                         }).then((address)=>{
                             res.status(200).send({
                                 success:true,
-                                address:address
+                                message:"Successfully Updated!"
                             })
                         }).catch(err => {
                             res.status(400).send({
