@@ -320,7 +320,7 @@ userRouter.post(
         try {
             await db('user_address')
             .insert({
-                address_name,
+                'address_name':address_name,
                 'user_id': req.user.id, 
                 'address_line1':addressLine1,
                 'address_line2':addressLine2,
@@ -331,6 +331,7 @@ userRouter.post(
                 alternate_number,
                 is_default
             }).then((address) => {
+                console.log(address)
                 res.status(201).send({
                     success: true,
                     msg: "added new address",
@@ -409,7 +410,7 @@ userRouter.get(
 )
 
 userRouter.put(
-    '',
+    '/address/',
     userJwt,
     expressAsyncHandler(async (req, res) => {
         try {
@@ -467,7 +468,7 @@ userRouter.put(
 )
 
 userRouter.delete(
-    '',
+    '/address/',
     userJwt,
     expressAsyncHandler(async (req, res)=>{
         try {
