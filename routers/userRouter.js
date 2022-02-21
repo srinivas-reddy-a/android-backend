@@ -448,12 +448,50 @@ userRouter.put(
                                 success:true,
                                 address:address
                             })
+                        }).catch(err => {
+                            res.status(400).send({
+                                success:false,
+                                msg: "No such user/product exists!"
+                            })
                         })
                     }
                 })
             })
         } catch (error) {
-            
+            res.status(500).send({
+                success:false,
+                message:'Server error'
+            })
+        }
+    })
+)
+
+userRouter.delete(
+    '',
+    userJwt,
+    expressAsyncHandler(async (req, res)=>{
+        try {
+            const { id } = req.body;
+            await db('user_address')
+            .where({
+                id:id
+            }).del()
+            .then(() => {
+                res.status(200).send({
+                    success: true,
+                    message: "deleted"
+                });
+            }).catch(err => {
+                res.status(400).send({
+                    success:false,
+                    msg: "No such user/product exists!"
+                })
+            })
+        } catch (error) {
+            res.status(500).send({
+                success:false,
+                message:'Server error'
+            })
         }
     })
 )
