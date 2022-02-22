@@ -197,7 +197,7 @@ wishListRouter.delete(
     '/:id/',
     userJwt,
     expressAsyncHandler(async (req, res) => {
-        const {product_id} = req.params.id;
+        const product_id = req.params.id;
         try {
             await db('wish_list')
             .where({

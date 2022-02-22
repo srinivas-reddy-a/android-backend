@@ -1,7 +1,7 @@
 import express from "express";
 import expressAsyncHandler from "express-async-handler";
 import userJwt from "../middleware/userMiddleware.js";
-import { request } from "express";
+import request from "request";
 
 const inventoryRouter = express.Router();
 
