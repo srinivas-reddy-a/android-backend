@@ -16,7 +16,7 @@ cartRouter.post(
         try {
             await db('cart')
             .insert({
-                usersz_id:req.body.id,
+                usersz_id:req.user.id,
                 product_id,
                 quantity,
             }).then(product => {

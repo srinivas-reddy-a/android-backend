@@ -16,18 +16,18 @@ wishListRouter.post(
         try {
             await db('wish_list')
             .insert({
-                userszs:req.user.id,
+                userszs_id:req.user.id,
                 productszs_id:product_id,
                 quantity,
             }).then(product => {
                 res.status(201).send({
                     success:true,
-                    product:product
+                    message:"Successfully added!"
                 })
             }).catch(err => {
                 res.status(400).send({
                     success:false,
-                    message: "db error"
+                    message: err
                 })
             })
         } catch (error) {
@@ -44,20 +44,59 @@ wishListRouter.get(
     userJwt,
     expressAsyncHandler(async (req, res) => {
         try {
-            await db('wish_list')
-            .where('userszs_id', '=', req.user.id)
-            .select('*')
-            .then(products => {
-                res.status(200).send({
-                    success:true,
-                    products: products
-                })
-            }).catch(err => {
-                res.status(400).send({
-                    success:false,
-                    message:"db error!"
+            await db.transaction(async trx => {
+                return trx('wish_list')
+                .where('userszs_id', '=', req.user.id)
+                .select('*')
+                .then(async product_ids => {
+                    if(product_ids.length){
+                        const promises = product_ids.map(async element => {
+                            return await trx('product')
+                            .where('id', element.id)
+                            .select('*')
+                            .then(product=>{     
+                                return product[0]
+                            }).catch(err => {
+                                res.status(400).send({
+                                    success:false,
+                                    msg: "No such user/address exists!"
+                                })
+                            })
+                        });
+                        const products = await Promise.all(promises)
+                        res.status(200).send({
+                            success:true,
+                            products:products
+                        })
+                    }
+                    else{
+                        res.status(400).send({
+                            success:false,
+                            msg: "WishList empty"
+                        })
+                    }
+                }).catch(err => {
+                    res.status(400).send({
+                        success:false,
+                        msg: "No such user/address exists!"
+                    })
                 })
             })
+            // await db('wish_list')
+            // .where('userszs_id', '=', req.user.id)
+            // .select('*')
+            // .then(products => {
+            //     console.log(products)
+            //     res.status(200).send({
+            //         success:true,
+            //         products: products
+            //     })
+            // }).catch(err => {
+            //     res.status(400).send({
+            //         success:false,
+            //         message:"db error!"
+            //     })
+            // })
         } catch (error) {
             res.status(500).send({
                 success:false,
