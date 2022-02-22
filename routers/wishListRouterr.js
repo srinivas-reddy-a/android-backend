@@ -13,23 +13,60 @@ wishListRouter.post(
             product_id,
             quantity
         }  = req.body;
+        console.log(req.body.product_id)
         try {
-            await db('wish_list')
-            .insert({
-                userszs_id:req.user.id,
-                productszs_id:product_id,
-                quantity,
-            }).then(product => {
-                res.status(201).send({
-                    success:true,
-                    message:"Successfully added!"
-                })
-            }).catch(err => {
-                res.status(400).send({
-                    success:false,
-                    message: err
+            await db.transaction(async trx=>{
+                return await trx('wish_list')
+                .where({
+                    userszs_id:req.user.id,
+                    productszs_id:product_id,
+                }).then(async products_id=>{
+                    if(products_id.length){
+                        res.status(200).send({
+                            success:true,
+                            message:"Product already exists in wish list!"
+                        })
+                    }else{
+                        return trx('wish_list')
+                        .insert({
+                            'userszs_id':req.user.id,
+                            'productszs_id':product_id,
+                            'quantity':quantity,
+                        }).then(product => {
+                            res.status(201).send({
+                                success:true,
+                                message:"Successfully added!"
+                            })
+                        }).catch(err => {
+                            res.status(400).send({
+                                success:false,
+                                message: err
+                            })
+                        })
+                    }
+                }).catch(err => {
+                    res.status(400).send({
+                        success:false,
+                        message: err
+                    })
                 })
             })
+            // await db('wish_list')
+            // .insert({
+            //     userszs_id:req.user.id,
+            //     productszs_id:product_id,
+            //     quantity,
+            // }).then(product => {
+            //     res.status(201).send({
+            //         success:true,
+            //         message:"Successfully added!"
+            //     })
+            // }).catch(err => {
+            //     res.status(400).send({
+            //         success:false,
+            //         message: err
+            //     })
+            // })
         } catch (error) {
             res.status(500).send({
                 success:false,
