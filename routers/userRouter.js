@@ -381,12 +381,15 @@ userRouter.get(
 
 //to retrieve individual address
 userRouter.get(
-    '/address/:id/',
+    '/address/default/',
     userJwt,
     expressAsyncHandler(async (req, res) => {
         try {
             await db('user_address')
-            .where('id', '=', req.params.id)
+            .where({
+                user_id:req.user.id,
+                is_default:1
+            })
             .select('*')
             .then(address => {
                 res.status(200).send({
@@ -473,7 +476,6 @@ userRouter.delete(
     expressAsyncHandler(async (req, res)=>{
         try {
             const id = req.params.id;
-            console.log(id)
             await db('user_address')
             .where({
                 id:id
