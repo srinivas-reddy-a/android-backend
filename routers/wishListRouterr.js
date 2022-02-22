@@ -206,11 +206,16 @@ wishListRouter.delete(
                 userszs_id: req.user.id,
                 productszs_id: product_id
             }).del()
-            .then(() => {
+            .then((success) => {
+                success?
                 res.status(200).send({
                     success: true,
                     message: "deleted"
-                });
+                })
+                :res.status(200).send({
+                    success: false,
+                    message: "dont exist"
+                })
             }).catch(err => {
                 res.status(400).send({
                     success:false,
