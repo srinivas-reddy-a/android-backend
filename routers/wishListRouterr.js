@@ -86,11 +86,13 @@ wishListRouter.get(
                 .select('*')
                 .then(async product_ids => {
                     if(product_ids.length){
+                        console.log(product_ids)
                         const promises = product_ids.map(async element => {
                             return await trx('product')
-                            .where('id', element.id)
+                            .where('id', element.productszs_id)
                             .select('*')
                             .then(product=>{     
+                                console.log(element)
                                 return product[0]
                             }).catch(err => {
                                 res.status(400).send({
