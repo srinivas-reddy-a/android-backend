@@ -199,7 +199,7 @@ wishListRouter.delete(
     userJwt,
     expressAsyncHandler(async (req, res) => {
         try {
-            await db('cart')
+            await db('wish_list')
             .where({
                 userszs_id: req.user.id,
                 productszs_id: product_id
