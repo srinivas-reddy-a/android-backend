@@ -13,7 +13,6 @@ wishListRouter.post(
             product_id,
             quantity
         }  = req.body;
-        console.log(req.body.product_id)
         try {
             await db.transaction(async trx=>{
                 return await trx('wish_list')
@@ -198,6 +197,7 @@ wishListRouter.delete(
     '/',
     userJwt,
     expressAsyncHandler(async (req, res) => {
+        const {product_id} = req.body;
         try {
             await db('wish_list')
             .where({
@@ -215,6 +215,7 @@ wishListRouter.delete(
                     msg: "No such user/product exists!"
                 })
             })
+            
         } catch (error) {
             res.status(500).send({
                 success:false,
