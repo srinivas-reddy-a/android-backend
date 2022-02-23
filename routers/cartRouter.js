@@ -128,8 +128,9 @@ cartRouter.get(
                             return await trx('product')
                             .where('id', element.product_id)
                             .select('*')
-                            .then(product=>{     
-                                console.log(element)
+                            .then(product=>{
+                                product[0].quantity=element.quantity
+                                console.log(product[0])
                                 return product[0]
                             }).catch(err => {
                                 res.status(400).send({
