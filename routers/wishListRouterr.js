@@ -40,7 +40,7 @@ wishListRouter.post(
         }
     })
 )
-
+//to add items
 wishListRouter.post(
     '/',
     userJwt,
