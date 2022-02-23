@@ -286,7 +286,7 @@ userRouter.put(
                 } else {
                     res.status(400).send({
                         success:false,
-                        msg: "No such user exists!"
+                        message: "No such user exists!"
                     })
                 }
             })
@@ -295,7 +295,7 @@ userRouter.put(
         })
         .catch(err => res.status(400).send({
             success: false,
-            msg: err
+            message: err
         }))
         
     })
@@ -334,18 +334,18 @@ userRouter.post(
                 console.log(address)
                 res.status(201).send({
                     success: true,
-                    msg: "added new address",
+                    message: "added new address",
                 })
             }).catch(err => {
                 res.status(400).send({
                     success: true,
-                    msg: err
+                    message: err
                 })
             })
         } catch (error) {
             res.status(500).send({
                 success:false,
-                msg:'server error'
+                message:'server error'
             })
         }
     }))
@@ -367,13 +367,13 @@ userRouter.get(
             .catch(err => {
                 res.status(400).send({
                     success:false,
-                    msg:'db error'
+                    message:'db error'
                 })
             })
         } catch (error) {
             res.status(500).send({
                 success:false,
-                msg:'user not found db error'
+                message:'user not found db error'
             })
         }
     })
@@ -400,13 +400,13 @@ userRouter.get(
             .catch(err => {
                 res.status(400).send({
                     success:false,
-                    msg:'db error'
+                    message:'db error'
                 })
             })
         } catch (error) {
             res.status(500).send({
                 success:false,
-                msg:'user not found db error'
+                message:'user not found db error'
             })
         }
     })
@@ -455,7 +455,7 @@ userRouter.put(
                         }).catch(err => {
                             res.status(400).send({
                                 success:false,
-                                msg: "No such user/address exists!"
+                                message: "No such user/address exists!"
                             })
                         })
                     }
@@ -488,7 +488,7 @@ userRouter.delete(
             }).catch(err => {
                 res.status(400).send({
                     success:false,
-                    msg: "No such user/address exists!"
+                    message: "No such user/address exists!"
                 })
             })
         } catch (error) {
@@ -526,13 +526,13 @@ userRouter.put(
                     }).catch(err => {
                         res.status(400).send({
                             success:false,
-                            msg: "No such user/address exists!"
+                            message: "No such user/address exists!"
                         })
                     })
                 }).catch(err => {
                     res.status(400).send({
                         success:false,
-                        msg: "No such user exists!"
+                        message: "No such user exists!"
                     })
                 })
             })

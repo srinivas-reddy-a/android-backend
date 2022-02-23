@@ -5,6 +5,42 @@ import userJwt from "../middleware/userMiddleware.js";
 
 const wishListRouter = express.Router();
 
+//to check whether product is in wishlist or not
+wishListRouter.post(
+    '/status/:id/',
+    userJwt,
+    expressAsyncHandler(async (req, res) =>{
+        const product_id = req.params.id;
+        try {
+            await db('wish_list')
+            .where({
+                userszs_id:req.user.id,
+                productszs_id:product_id,
+            }).then((product) => {
+                product.length
+                ? res.status(200).send({
+                    success:true,
+                    message:"Product already exists in wishlist!"
+                })
+                : res.status(400).send({
+                    success:false,
+                    message:"Product not in wishlist!"
+                })
+            }).catch(err => {
+                res.status(400).send({
+                    success:false,
+                    message: err
+                })
+            })
+        } catch (error) {
+            res.status(500).send({
+                success:false,
+                message:'server error'
+            })
+        }
+    })
+)
+
 wishListRouter.post(
     '/',
     userJwt,
@@ -96,7 +132,7 @@ wishListRouter.get(
                             }).catch(err => {
                                 res.status(400).send({
                                     success:false,
-                                    msg: "No such user/address exists!"
+                                    message: "No such user/address exists!"
                                 })
                             })
                         });
@@ -109,13 +145,13 @@ wishListRouter.get(
                     else{
                         res.status(400).send({
                             success:false,
-                            msg: "WishList empty"
+                            message: "WishList empty"
                         })
                     }
                 }).catch(err => {
                     res.status(400).send({
                         success:false,
-                        msg: "No such user/address exists!"
+                        message: "No such user/address exists!"
                     })
                 })
             })
@@ -170,20 +206,20 @@ wishListRouter.put(
                             }).then(product => {
                                 res.status(201).send({
                                     success: true,
-                                    product:product
+                                    message:"Updated Successfully!"
                                 });
                             })
                         }else {
                             res.status(400).send({
                                 success:false,
-                                msg: "No such user/product exists!"
+                                message: "No such user/product exists!"
                             })
                         }
                     }).then(trx.commit)
                     .catch(trx.rollback);
                 }).catch(err => res.status(400).send({
                     success: false,
-                    msg: err
+                    message: err
                 }))
         } catch (error) {
             res.status(500).send({
@@ -218,7 +254,7 @@ wishListRouter.delete(
             }).catch(err => {
                 res.status(400).send({
                     success:false,
-                    msg: "No such user/product exists!"
+                    message: "No such user/product exists!"
                 })
             })
             

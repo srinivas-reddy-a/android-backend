@@ -4,6 +4,44 @@ import db from "../config/database.js";
 import userJwt from "../middleware/userMiddleware.js";
 
 const cartRouter = express.Router();
+
+//to check whether product is in cart or not
+cartRouter.post(
+    '/status/:id/',
+    userJwt,
+    expressAsyncHandler(async (req, res) =>{
+        const product_id = req.params.id;
+        try {
+            await db('cart')
+            .where({
+                usersz_id:req.user.id,
+                product_id:product_id,
+            }).then((product) => {
+                product.length
+                ? res.status(200).send({
+                    success:true,
+                    message:"Product already exists in cart!"
+                })
+                : res.status(400).send({
+                    success:false,
+                    message:"Product not in cart!"
+                })
+            }).catch(err => {
+                res.status(400).send({
+                    success:false,
+                    message: err
+                })
+            })
+        } catch (error) {
+            res.status(500).send({
+                success:false,
+                message:'server error'
+            })
+        }
+    })
+)
+
+
 //to add items
 cartRouter.post(
     '/',
@@ -96,7 +134,7 @@ cartRouter.get(
                             }).catch(err => {
                                 res.status(400).send({
                                     success:false,
-                                    msg: "No such user/address exists!"
+                                    message: "No such user/address exists!"
                                 })
                             })
                         });
@@ -109,13 +147,13 @@ cartRouter.get(
                     else{
                         res.status(400).send({
                             success:false,
-                            msg: "WishList empty"
+                            message: "WishList empty"
                         })
                     }
                 }).catch(err => {
                     res.status(400).send({
                         success:false,
-                        msg: "No such user/address exists!"
+                        message: "No such user/address exists!"
                     })
                 })
             })
@@ -177,14 +215,14 @@ cartRouter.put(
                         }else {
                             res.status(400).send({
                                 success:false,
-                                msg: "No such user/product exists!"
+                                message: "No such user/product exists!"
                             })
                         }
                     }).then(trx.commit)
                     .catch(trx.rollback);
                 }).catch(err => res.status(400).send({
                     success: false,
-                    msg: err
+                    message: err
                 }))
         } catch (error) {
             res.status(500).send({
@@ -219,7 +257,7 @@ cartRouter.delete(
             }).catch(err => {
                 res.status(400).send({
                     success:false,
-                    msg: "No such user/product exists!"
+                    message: "No such user/product exists!"
                 })
             })
         } catch (error) {
