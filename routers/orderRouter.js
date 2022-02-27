@@ -30,7 +30,7 @@ orderRouter.post(
             }).then(order => {
                 res.status(201).send({
                     success:true,
-                    order:order
+                    message:order[0]
                 })
             }).catch(err => {
                 res.status(400).send({
