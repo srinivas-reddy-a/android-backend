@@ -4,7 +4,10 @@ import db from "../config/database.js";
 import userJwt from "../middleware/userMiddleware.js";
 
 const orderRouter = express.Router();
-
+// var date = order[0].created_at;
+// console.log(date)
+//timestamp to date conversion
+// console.log(new Date(date.setDate(date.getDate()+4)))
 orderRouter.post(
     '/',
     userJwt,
@@ -13,10 +16,15 @@ orderRouter.post(
             total,
             address_id,
         } = req.body;
+        
         try {
+            const date = new Date();
+            const dDate = new Date(date.setDate(date.getDate()+4))
             await db('order')
             .insert({
                 'user_id': req.user.id,
+                'created_at':new Date(),
+                'delivery_date':dDate,
                 address_id,
                 total
             }).then(order => {
@@ -53,16 +61,18 @@ orderRouter.post(
             .insert({
                 order_id,
                 'products_id':product_id,
-                quantity
-            }).then(order => {
+                quantity,
+                'created_at':new Date()
+            }).then(orderDetail => {
                 res.status(201).send({
                     success:true,
+                    orderDetail:orderDetail,
                     message:"order placed"
                 })
             }).catch(err => {
                 res.status(400).send({
                     success:false,
-                    message: "db error"
+                    message: err
                 })
             })
         } catch (error) {
@@ -74,6 +84,7 @@ orderRouter.post(
     })
 )
 
+
 //order id in url
 orderRouter.get(
     '/:id/',
@@ -81,7 +92,10 @@ orderRouter.get(
     expressAsyncHandler(async (req, res) => {
         try {
             await db('order')
-            .where('id', '=', req.params.id)
+            .where({
+                'id':req.params.id,
+                'user_id':req.user.id
+            })
             .select('*')
             .then(order => {
                 res.status(200).send({
@@ -110,10 +124,10 @@ orderRouter.get(
             await db('order_details')
             .where('id', '=', req.params.id)
             .select('*')
-            .then(order => {
+            .then(orderDetails => {
                 res.status(200).send({
                     success:true,
-                    order:order
+                    orderDetails:orderDetails
                 })
             }).catch(err => {
                 res.status(400).send({
@@ -154,6 +168,49 @@ orderRouter.get(
                 success:false,
                 message:"server error!"
             })
+        }
+    })
+)
+
+orderRouter.delete(
+    '/:id/',
+    userJwt,
+    expressAsyncHandler(async (req, res)=> {
+        const order_id = req.params.id;
+        try {
+            await db.transaction(async (trx) => {
+                return trx('order_detail')
+                .where({
+                    'order_id':order_id,
+                }).del()
+                .then(() => {
+                    return trx('order')
+                    .where({
+                        'id':order_id,
+                    }).del()
+                    .then(() => {
+                        res.status(200).send({
+                            success:true,
+                            message:"order deleted"
+                        })
+                    }).catch(err => {
+                        res.status(400).send({
+                            success:false,
+                            message: "No such user/order exists!"
+                        })
+                    })
+                }).catch(err => {
+                    res.status(400).send({
+                        success:false,
+                        message: "No such user/order exists!"
+                    })
+                })
+            })    
+        } catch (error) {
+            res.status(500).send({
+                success:false,
+                message:"server error!"
+            })            
         }
     })
 )
