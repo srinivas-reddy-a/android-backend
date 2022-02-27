@@ -143,26 +143,65 @@ orderRouter.get(
         }
     })
 )
-
+//get all orders and respected products
 orderRouter.get(
     '/',
     userJwt,
     expressAsyncHandler(async (req, res) => {
         try {
-            await db('order')
-            .where('user_id', '=', req.user.id)
-            .select('*')
-            .then(order => {
-                res.status(200).send({
-                    success:true,
-                    order:order
-                })
-            }).catch(err => {
-                res.status(400).send({
-                    success:false,
-                    message:"db error!"
+            await db.transaction(async trx => {
+                return trx('order')
+                .where('user_id', '=', req.user.id)
+                .select('*')
+                .then(async (orders) => {
+                    if(orders.length){
+                        const promises = orders.map(async order => {
+                            return await trx('order_details')
+                            .where({
+                                'order_id':order.id
+                            }).select('*')
+                            .then(orderDetails => {
+                                return orderDetails
+                            }).catch(err => {
+                                res.status(400).send({
+                                    success:false,
+                                    message: "No such user/address exists!"
+                                })
+                            })
+                        });
+                        const products = await Promise.all(promises)
+                        console.log(products)
+                        res.status(200).send({
+                            success:true,
+                            products:products
+                        })
+                    }else{
+                        res.status(400).send({
+                            success:false,
+                            message: "WishList empty"
+                        })
+                    }
+                }).catch(err => {
+                    res.status(400).send({
+                        success:false,
+                        message: "No such user/address exists!"
+                    })
                 })
             })
+            // await db('order')
+            // .where('user_id', '=', req.user.id)
+            // .select('*')
+            // .then(order => {
+            //     res.status(200).send({
+            //         success:true,
+            //         order:order
+            //     })
+            // }).catch(err => {
+            //     res.status(400).send({
+            //         success:false,
+            //         message:"db error!"
+            //     })
+            // })
         } catch (error) {
             res.status(500).send({
                 success:false,
@@ -171,7 +210,7 @@ orderRouter.get(
         }
     })
 )
-
+//to delete order after collecting package
 orderRouter.delete(
     '/:id/',
     userJwt,
@@ -179,11 +218,11 @@ orderRouter.delete(
         const order_id = req.params.id;
         try {
             await db.transaction(async (trx) => {
-                return trx('order_detail')
+                return trx('order_details')
                 .where({
                     'order_id':order_id,
                 }).del()
-                .then(() => {
+                .then(async () => {
                     return trx('order')
                     .where({
                         'id':order_id,
@@ -196,13 +235,13 @@ orderRouter.delete(
                     }).catch(err => {
                         res.status(400).send({
                             success:false,
-                            message: "No such user/order exists!"
+                            message: err
                         })
                     })
                 }).catch(err => {
                     res.status(400).send({
                         success:false,
-                        message: "No such user/order exists!"
+                        message: err
                     })
                 })
             })    
@@ -214,5 +253,7 @@ orderRouter.delete(
         }
     })
 )
+
+
 
 export default orderRouter;
