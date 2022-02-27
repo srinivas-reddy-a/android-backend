@@ -161,6 +161,16 @@ orderRouter.get(
                                 'order_id':order.id
                             }).select('*')
                             .then(orderDetails => {
+                                orderDetails.forEach(orderDetails => {
+                                    orderDetails.user_id=order.user_id;
+                                    orderDetails.total = order.total;
+                                    orderDetails.delivery_type = order.delivery_type
+                                    orderDetails.delivery_date = order.delivery_date
+                                    orderDetails.is_delivered = order.is_delivered;
+                                    orderDetails.is_shipped = order.is_shipped;
+                                    orderDetails.delivered_on = order.delivered_on;
+                                    orderDetails.address_id = order.address_id
+                                })
                                 return orderDetails
                             }).catch(err => {
                                 res.status(400).send({
@@ -170,7 +180,6 @@ orderRouter.get(
                             })
                         });
                         const products = await Promise.all(promises)
-                        console.log(products)
                         res.status(200).send({
                             success:true,
                             products:products
