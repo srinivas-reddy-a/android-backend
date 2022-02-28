@@ -73,8 +73,6 @@ cartRouter.post(
                             'quantity':quantity,
                             'volume':volume
                         }).then(product => {
-                            console.log(volume)
-                            console.log(product)
                             res.status(201).send({
                                 success:true,
                                 message:"Successfully added!"
@@ -219,13 +217,11 @@ cartRouter.delete(
     userJwt,
     expressAsyncHandler(async (req, res) => {
         const product_id = req.params.id
-        const {volume} = req.body
         try {
             await db('cart')
             .where({
                 usersz_id: req.user.id,
                 product_id: product_id,
-                volume:volume
             }).del()
             .then((success) => {
                 success?
