@@ -11,11 +11,13 @@ cartRouter.post(
     userJwt,
     expressAsyncHandler(async (req, res) =>{
         const product_id = req.params.id;
+        const {volume} = req.body;
         try {
             await db('cart')
             .where({
                 usersz_id:req.user.id,
                 product_id:product_id,
+                volume:volume
             }).then((product) => {
                 product.length
                 ? res.status(200).send({
