@@ -54,7 +54,8 @@ orderRouter.post(
         const {
             order_id,
             product_id,
-            quantity
+            quantity,
+            volume
         } = req.body
         try {
             await db('order_details')
@@ -62,7 +63,8 @@ orderRouter.post(
                 order_id,
                 'products_id':product_id,
                 quantity,
-                'created_at':new Date()
+                'created_at':new Date(),
+                volume:volume
             }).then(orderDetail => {
                 res.status(201).send({
                     success:true,
@@ -199,20 +201,6 @@ orderRouter.get(
                     })
                 })
             })
-            // await db('order')
-            // .where('user_id', '=', req.user.id)
-            // .select('*')
-            // .then(order => {
-            //     res.status(200).send({
-            //         success:true,
-            //         order:order
-            //     })
-            // }).catch(err => {
-            //     res.status(400).send({
-            //         success:false,
-            //         message:"db error!"
-            //     })
-            // })
         } catch (error) {
             res.status(500).send({
                 success:false,
@@ -221,6 +209,7 @@ orderRouter.get(
         }
     })
 )
+
 //to delete order after collecting package
 orderRouter.delete(
     '',
@@ -265,21 +254,13 @@ orderRouter.delete(
     })
 )
 
-// orderRouter.put(
-//     '',
-//     userJwt,
-//     expressAsyncHandler(async (req, res) => {
-//         const {
-//             order_id
-//         } = req.body.order_id;
-//         await db.transaction(async trx => {
-//             return await trx('order_details')
-//             .where({
-//                 id:order_id
-//             })
-//         })
-//     })
-// )
+orderRouter.put(
+    '/cancel/',
+    userJwt,
+    expressAsyncHandler(async (req, res) => {
+         
+    })
+)
 
 
 
