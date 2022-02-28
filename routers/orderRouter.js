@@ -152,6 +152,7 @@ orderRouter.get(
             await db.transaction(async trx => {
                 return trx('order')
                 .where('user_id', '=', req.user.id)
+                .orderBy('id','desc')
                 .select('*')
                 .then(async (orders) => {
                     if(orders.length){
@@ -160,6 +161,7 @@ orderRouter.get(
                             .where({
                                 'order_id':order.id
                             }).select('*')
+
                             .then(orderDetails => {
                                 orderDetails.forEach(orderDetails => {
                                     orderDetails.user_id=order.user_id;
@@ -182,12 +184,12 @@ orderRouter.get(
                         const products = await Promise.all(promises)
                         res.status(200).send({
                             success:true,
-                            products:products
+                            products:Array.prototype.concat.apply([],products)
                         })
                     }else{
                         res.status(400).send({
                             success:false,
-                            message: "WishList empty"
+                            message: "WishList empty!"
                         })
                     }
                 }).catch(err => {
