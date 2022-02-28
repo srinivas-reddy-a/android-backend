@@ -223,10 +223,10 @@ orderRouter.get(
 )
 //to delete order after collecting package
 orderRouter.delete(
-    '/:id/',
+    '',
     userJwt,
     expressAsyncHandler(async (req, res)=> {
-        const order_id = req.params.id;
+        const {order_id} = req.body;
         try {
             await db.transaction(async (trx) => {
                 return trx('order_details')
@@ -264,6 +264,22 @@ orderRouter.delete(
         }
     })
 )
+
+// orderRouter.put(
+//     '',
+//     userJwt,
+//     expressAsyncHandler(async (req, res) => {
+//         const {
+//             order_id
+//         } = req.body.order_id;
+//         await db.transaction(async trx => {
+//             return await trx('order_details')
+//             .where({
+//                 id:order_id
+//             })
+//         })
+//     })
+// )
 
 
 

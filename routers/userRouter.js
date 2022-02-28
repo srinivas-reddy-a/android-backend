@@ -544,4 +544,34 @@ userRouter.put(
         }
     })
 )
+
+userRouter.get(
+    '/address/:id/',
+    userJwt,
+    expressAsyncHandler(async (req, res) => {
+        const address_id = req.params.id;
+        try {
+            await db('user_address')
+            .where({
+                'id':address_id
+            }).select('*')
+            .then(async (address) => {
+                res.status(200).send({
+                    success:true,
+                    address:address
+                })
+            }).catch(err => {
+                res.status(400).send({
+                    success:false,
+                    message:"No user/address found!"
+                })
+            })
+        } catch (error) {
+            res.status(500).send({
+                success:false,
+                message:"Server error!"
+            })
+        }
+    })
+)
 export default  userRouter;
