@@ -49,7 +49,8 @@ cartRouter.post(
     expressAsyncHandler(async (req, res) => {
         const {
             product_id,
-            quantity
+            quantity,
+            volume
         }  = req.body;
         try {
             await db.transaction(async trx=>{
@@ -57,6 +58,7 @@ cartRouter.post(
                 .where({
                     usersz_id:req.user.id,
                     product_id:product_id,
+                    volume:volume
                 }).then(async products_id=>{
                     if(products_id.length){
                         res.status(200).send({
@@ -69,7 +71,10 @@ cartRouter.post(
                             'usersz_id':req.user.id,
                             'product_id':product_id,
                             'quantity':quantity,
+                            'volume':volume
                         }).then(product => {
+                            console.log(volume)
+                            console.log(product)
                             res.status(201).send({
                                 success:true,
                                 message:"Successfully added!"
@@ -88,22 +93,6 @@ cartRouter.post(
                     })
                 })
             })
-            // await db('wish_list')
-            // .insert({
-            //     userszs_id:req.user.id,
-            //     productszs_id:product_id,
-            //     quantity,
-            // }).then(product => {
-            //     res.status(201).send({
-            //         success:true,
-            //         message:"Successfully added!"
-            //     })
-            // }).catch(err => {
-            //     res.status(400).send({
-            //         success:false,
-            //         message: err
-            //     })
-            // })
         } catch (error) {
             res.status(500).send({
                 success:false,
@@ -130,7 +119,7 @@ cartRouter.get(
                             .select('*')
                             .then(product=>{
                                 product[0].quantity=element.quantity
-                                console.log(product[0])
+                                product[0].volume = element.volume
                                 return product[0]
                             }).catch(err => {
                                 res.status(400).send({
@@ -158,21 +147,6 @@ cartRouter.get(
                     })
                 })
             })
-            // await db('wish_list')
-            // .where('userszs_id', '=', req.user.id)
-            // .select('*')
-            // .then(products => {
-            //     console.log(products)
-            //     res.status(200).send({
-            //         success:true,
-            //         products: products
-            //     })
-            // }).catch(err => {
-            //     res.status(400).send({
-            //         success:false,
-            //         message:"db error!"
-            //     })
-            // })
         } catch (error) {
             res.status(500).send({
                 success:false,
@@ -188,25 +162,31 @@ cartRouter.put(
     expressAsyncHandler(async (req, res) =>{
         const {
             product_id,
-            quantity
+            quantity,
+            currentVolume,
+            updatedVolume
         }  = req.body;
         try {
             await db.transaction(async trx => {
                 return trx('cart')
                     .where({
                         usersz_id: req.user.id,
-                        product_id: product_id
+                        product_id: product_id,
+                        volume:currentVolume
                     })
-                    .then(product => {
+                    .then(async product => {
                         if(product.length){
                             product = product[0];
                             product.quantity = quantity;
+                            product.volume = updatedVolume;
                             return trx('cart')
                             .where({
                                 usersz_id: req.user.id,
-                                product_id: product_id
+                                product_id: product_id,
+                                volume:currentVolume
                             }).update({
-                                quantity:quantity
+                                quantity:quantity,
+                                volume:updatedVolume
                             }).then(product => {
                                 res.status(201).send({
                                     success: true,
@@ -239,11 +219,13 @@ cartRouter.delete(
     userJwt,
     expressAsyncHandler(async (req, res) => {
         const product_id = req.params.id
+        const {volume} = req.body
         try {
             await db('cart')
             .where({
                 usersz_id: req.user.id,
-                product_id: product_id
+                product_id: product_id,
+                volume:volume
             }).del()
             .then((success) => {
                 success?
