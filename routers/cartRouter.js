@@ -137,7 +137,7 @@ cartRouter.get(
                     else{
                         res.status(400).send({
                             success:false,
-                            message: "WishList empty"
+                            message: "Cart empty"
                         })
                     }
                 }).catch(err => {
