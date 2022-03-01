@@ -2,6 +2,7 @@ import express from "express";
 import expressAsyncHandler from "express-async-handler";
 import knex from "knex";
 import db from "../config/database.js";
+import userJwt from "../middleware/userMiddleware.js";
 
 const productRouter = express.Router();
 
@@ -62,6 +63,87 @@ productRouter.get(
             })
         }
     }))
+
+//price sort high to low
+productRouter.get(
+    '/sort/high/',
+    expressAsyncHandler(async (req, res) => {
+        try {
+            await db('product')
+                .orderBy('price', 'desc')
+                .then(products => {
+                    res.status(200).send({
+                        success:true,
+                        products:products
+                    })
+                }).catch(err => res.status(400).send({
+                    success:false,
+                    message:"db error"
+                }))
+        } catch (error) {
+            res.status(500).send({
+                success:false,
+                message:"server error"
+            })
+        }
+        
+    })
+)
+
+
+//price sort low to high
+productRouter.get(
+    '/sort/low/',
+    expressAsyncHandler(async (req, res) => {
+        try {
+            await db('product')
+                .orderBy('price', 'asc')
+                .then(products => {
+                    res.status(200).send({
+                        success:true,
+                        products:products
+                    })
+                }).catch(err => res.status(400).send({
+                    success:false,
+                    message:"db error"
+                }))
+        } catch (error) {
+            res.status(500).send({
+                success:false,
+                message:"server error"
+            })
+        }
+        
+    })
+)
+
+//filter using price ranges
+productRouter.get(
+    '/filter/',
+    expressAsyncHandler(async (req, res) => {
+        const {low} = req.body;
+        const {high} = req.body;
+        try {
+            await db('product')
+                .havingBetween('price', [low, high])
+                .select('*')
+                .then(products => {
+                    res.status(200).send({
+                        success:true,
+                        products:products
+                    })
+                }).catch(err => res.status(400).send({
+                    success:false,
+                    message:"db error"
+                }))
+        } catch (error) {
+            res.status(500).send({
+                success:false,
+                message:"server error"
+            })
+        }
+    })
+)
 
 
 productRouter.get(
@@ -176,5 +258,7 @@ productRouter.post(
         }
     })
 )
+
+
 
 export default productRouter;
