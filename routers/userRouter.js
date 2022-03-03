@@ -307,6 +307,8 @@ userRouter.post(
     })
 )
 
+
+//to verify login
 userRouter.post(
     '/login/otp/',
     expressAsyncHandler(async (req, res) => {
