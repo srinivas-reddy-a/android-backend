@@ -1,85 +1,169 @@
-import express from "express";
+import express, { response } from "express";
 import expressAsyncHandler from "express-async-handler";
 import db from "../config/database.js";
 import jwt from 'jsonwebtoken';
 import userJwt from "../middleware/userMiddleware.js";
+import axios from "axios";
+import dotenv from 'dotenv';
 
+dotenv.config()
+const authkey = process.env.AUTH_KEY;
+const msg91_template_id = process.env.TEMPLATE_ID_MSG91;
+const otp_length = process.env.OTP_LENGTH;
+const unicode = process.env.UNICODE;
 
 const userRouter = express.Router();
+
 userRouter.post(
     '/register/', 
     expressAsyncHandler(async (req, res) => {
         const { phoneNumber} = req.body;
-        db('user').where('phone_number', phoneNumber).select('id')
-        .then(user => {
-            user.length
-            ? res.status(400).send({
-                success:false,
-                err:"user already exists with the number!"
+        try {
+            await db('user').where('phone_number', phoneNumber).select('id')
+            .then(async user => {
+                if(user.length){
+                    res.status(400).send({
+                        success:false,
+                        err:"user already exists with the number!"
+                    })
+                }else{
+                    await axios.get(`https://api.msg91.com/api/v5/otp?template_id=${msg91_template_id}&mobile=91${phoneNumber}&authkey=${authkey}&otp_length=${otp_length}&unicode=${unicode}`)
+                    .then(response => {
+                        if(response.data.type === "success"){
+                            res.status(200).send({
+                                success:true,
+                                message:"enter otp"
+                            })
+                        }else{
+                            res.status(400).send({
+                                success:false,
+                                message:"otp error"
+                            })
+                        }
+                    }).catch(err => {
+                        res.status(400).send({
+                            success:false,
+                            message:"otp error"
+                        })
+                    })
+                }
+            }).catch(err => {
+                res.status(400).send({
+                    success:false,
+                    message:"data error"
+                })
             })
-            : res.status(200).send({
-                success:true,
-                message:"enter otp"}
-                );
-        })
-        .catch(err => {
+        } catch (error) {
             res.status(500).send({
                 success:false,
-                message:"data error"
+                message:"server error"
             })
-        })
+        }
         
 }))
+
+userRouter.post(
+    '/register/otp/resend/',
+    expressAsyncHandler(async (req, res) => {
+        const { phoneNumber} = req.body;
+        try {
+            await db('user').where('phone_number', phoneNumber).select('id')
+            .then(async user => {
+                if(user.length){
+                    res.status(400).send({
+                        success:false,
+                        err:"user already exists with the number!"
+                    })
+                }else{
+                    await axios.get(`https://api.msg91.com/api/v5/otp/retry?authkey=${authkey}&retrytype=text&mobile=91${phoneNumber}`)
+                    .then(response => {
+                        if(response.data.type === "success"){
+                            res.status(200).send({
+                                success:true,
+                                message:"enter otp"
+                            })
+                        }else{
+                            res.status(400).send({
+                                success:false,
+                                message:"otp error"
+                            })
+                        }
+                    }).catch(err => {
+                        res.status(400).send({
+                            success:false,
+                            message:"otp error"
+                        })
+                    })
+                }
+            }).catch(err => {
+                res.status(400).send({
+                    success:false,
+                    message:"data error"
+                })
+            })
+        } catch (error) {
+            res.status(500).send({
+                success:false,
+                message:"server error"
+            })
+        }
+    })
+
+)
 
 userRouter.post(
     '/register/otp/',
     expressAsyncHandler(async (req, res) => {
         const { phoneNumber,otp } = req.body;
-        if(otp==1234){
-            try {
-                db.select('id')
-                .from('user')
-                .orderBy('id', 'desc')
-                .limit(1)
-                .then(id => {
-                    const payload = {
-                        user: {
-                            id: id[0].id+1
+        await axios.get(`https://api.msg91.com/api/v5/otp/verify?authkey=${authkey}&mobile=91${phoneNumber}&otp=${otp}`)
+        .then(response =>{
+            if(response.data.type==="success"){
+                try {
+                    db.select('id')
+                    .from('user')
+                    .orderBy('id', 'desc')
+                    .limit(1)
+                    .then(id => {
+                        const payload = {
+                            user: {
+                                id: id[0].id+1
+                            }
                         }
-                    }
-                    jwt.sign(payload, "jwtsecret", 
-                    (err, token) => {
-                        if(err) throw err
-                        db('user')
-                        .insert({
-                            'id':id[0].id+1,
-                            'phone_number':phoneNumber,
-                            'token':token
-                        })
-                        .then(user => {
-                            res.status(200).send({
-                                success: true,
-                                token: token
+                        jwt.sign(payload, "jwtsecret", 
+                        (err, token) => {
+                            if(err) throw err
+                            db('user')
+                            .insert({
+                                'id':id[0].id+1,
+                                'phone_number':phoneNumber,
+                                'token':token
                             })
+                            .then(user => {
+                                res.status(200).send({
+                                    success: true,
+                                    token: token
+                                })
+                            })
+                        
                         })
-                    
                     })
-                })
-                .catch(err => res.status(400).send("db error"))
-            } catch (error) {
+                    .catch(err => res.status(400).send("db error"))
+                } catch (error) {
+                    res.status(500).send({
+                        success:false,
+                        message:"internal error"
+                    });
+                }
+                
+            }
+            else{
                 res.status(401).send({
                     success:false,
-                    message:"internal error"
+                    message:"invalid otp"
                 });
             }
-            
-        }
-        else{
-            res.status(401).send({
-                success:false,
-                message:"invalid otp"
-            });
-        }
+        })
+        
     }))
 
 userRouter.post(
@@ -139,65 +223,136 @@ userRouter.post(
     '/login/', 
     expressAsyncHandler(async (req, res) => {
     const phoneNumber = req.body.phoneNumber;
-    
-    db('user').where('phone_number', phoneNumber).select('id')
-        .then(user => {
-            user.length
-            ? res.status(200).send({
-                id:user[0].id,
-                message:"enter otp"
-            })
-            : res.status(400).send("User not registered! Go register");
-        })
-        .catch(err => res.status(500).send({
+    try {
+        await db('user').where('phone_number', phoneNumber).select('id')
+        .then(async user => {
+            if(user.length){
+                await axios.get(`https://api.msg91.com/api/v5/otp?template_id=${msg91_template_id}&mobile=91${phoneNumber}&authkey=${authkey}&otp_length=${otp_length}&unicode=${unicode}`)
+                .then(response => {
+                    if(response.data.type === "success"){
+                        res.status(200).send({
+                            success:true,
+                            id:user[0].id,
+                            message:"enter otp"
+                        })
+                    }else{
+                        res.status(400).send({
+                            success:false,
+                            message:"otp error"
+                        })
+                    }
+                })
+            }else{
+                res.status(400).send("User not registered! Go register");
+            }
+
+        }).catch(err => res.status(500).send({
             success:true,
             message:"db error"
         }))
+    } catch (error) {
+        res.status(500).send({
+            success:false,
+            message:"server error"
+        })
+    }   
 }))
     
 userRouter.post(
-    '/login/otp/',
+    '/login/otp/resend/',
     expressAsyncHandler(async (req, res) => {
-        const { id, otp } = req.body;
-        if(otp==1234){
-            try {
-                const payload = {
-                    user: {
-                        id: id
-                    }
-                }
-                jwt.sign(payload, "jwtsecret", 
-                (err, token) => {
-                    if(err) throw err
-                    db('user')
-                    .where('id', id)
-                    .update({
-                        'token':token
-                    })
-                    .then(user => {
-                        res.status(200).send({
-                            success: true,
-                            token: token
+        const phoneNumber = req.body.phoneNumber;
+        try {
+            await db('user').where('phone_number', phoneNumber).select('id')
+            .then(async user => {
+                if(user.length){
+                    await axios.get(`https://api.msg91.com/api/v5/otp/retry?authkey=${authkey}&retrytype=text&mobile=91${phoneNumber}`)
+                    .then(response => {
+                        if(response.data.type === "success"){
+                            res.status(200).send({
+                                success:true,
+                                message:"enter otp"
+                            })
+                        }else{
+                            res.status(400).send({
+                                success:false,
+                                message:"otp error"
+                            })
+                        }
+                    }).catch(err => {
+                        res.status(400).send({
+                            success:false,
+                            message:"otp error"
                         })
                     })
-                    .catch(err => {
-                        res.status(400).send("db error")
-                    })  
-                })     
-            } catch (error) {
+                }else{
+                    res.status(400).send({
+                        success:false,
+                        err:"User not registered! Go register"
+                    })
+                    
+                }
+            }).catch(err => {
+                res.status(400).send({
+                    success:false,
+                    message:"data error"
+                })
+            })
+        } catch (error) {
+            res.status(500).send({
+                success:false,
+                message:"server error"
+            })
+        }
+    })
+)
+
+userRouter.post(
+    '/login/otp/',
+    expressAsyncHandler(async (req, res) => {
+        const { id, otp,phoneNumber } = req.body;
+        await axios.get(`https://api.msg91.com/api/v5/otp/verify?authkey=${authkey}&mobile=91${phoneNumber}&otp=${otp}`)
+        .then(response => {
+            if(response.data.type==="success"){
+                try {
+                    const payload = {
+                        user: {
+                            id: id
+                        }
+                    }
+                    jwt.sign(payload, "jwtsecret", 
+                    (err, token) => {
+                        if(err) throw err
+                        db('user')
+                        .where('id', id)
+                        .update({
+                            'token':token
+                        })
+                        .then(user => {
+                            res.status(200).send({
+                                success: true,
+                                token: token
+                            })
+                        })
+                        .catch(err => {
+                            res.status(400).send("db error")
+                        })  
+                    })     
+                } catch (error) {
+                    res.status(401).send({
+                        success:false,
+                        message:"internal error"
+                    });
+                }      
+            }
+            else{
                 res.status(401).send({
                     success:false,
-                    message:"internal error"
+                    message:"invalid otp"
                 });
             }
-            
-        }
-        else{
-            res.status(401).send({
-                success:false,
-                message:"invalid otp"
-            });
-        }
+        })
+        
     }))
 
 
@@ -331,7 +486,6 @@ userRouter.post(
                 alternate_number,
                 is_default
             }).then((address) => {
-                console.log(address)
                 res.status(201).send({
                     success: true,
                     message: "added new address",

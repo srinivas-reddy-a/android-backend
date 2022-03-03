@@ -6,11 +6,14 @@ import cartRouter from "./routers/cartRouter.js";
 import wishListRouter from "./routers/wishListRouterr.js";
 import brandRouter from "./routers/brandRounter.js";
 import inventoryRouter from "./routers/inventoryRouter.js";
+import cors from "cors";
 
 const PORT = process.env.PORT || 3000;
 const app = express();
+
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
+app.use(cors());
 
 app.use('/api/brand/', brandRouter);
 app.use('/api/user/', userRouter);
