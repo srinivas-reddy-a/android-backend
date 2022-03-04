@@ -1,13 +1,16 @@
 import knex from 'knex';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const db = knex({
-    client: 'mysql',
+    client: process.env.DB_CLIENT,
     connection: {
-      host : 'andoid-db0001.ceb5k0d6icw1.ap-south-1.rds.amazonaws.com',
-      port : 3306,
-      user : 'admin',
-      password : 'adminadmin',
-      database : 'test'
+      host : process.env.DB_AWS_HOST,
+      port : process.env.DB_PORT,
+      user : process.env.DB_USER,
+      password : process.env.DB_PASSWORD,
+      database : process.env.DB_NAME
     }
   });
 

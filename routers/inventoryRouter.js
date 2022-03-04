@@ -21,7 +21,6 @@ inventoryRouter.get(
         }
 
         request(options,  (error, response) => {
-            console.log(error,response.body);
             return;
         });
     })

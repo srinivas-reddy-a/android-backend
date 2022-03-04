@@ -12,6 +12,5 @@ const params = {
 }
 
 request({options, qs:params},  (error, response) => {
-    console.log(error,response.body);
     return;
 });
