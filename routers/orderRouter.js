@@ -210,58 +210,118 @@ orderRouter.get(
     })
 )
 
-//to delete order after collecting package
-orderRouter.delete(
-    '',
-    userJwt,
-    expressAsyncHandler(async (req, res)=> {
-        const {order_id} = req.body;
-        try {
-            await db.transaction(async (trx) => {
-                return trx('order_details')
-                .where({
-                    'order_id':order_id,
-                }).del()
-                .then(async () => {
-                    return trx('order')
-                    .where({
-                        'id':order_id,
-                    }).del()
-                    .then(() => {
-                        res.status(200).send({
-                            success:true,
-                            message:"order deleted"
-                        })
-                    }).catch(err => {
-                        res.status(400).send({
-                            success:false,
-                            message: err
-                        })
-                    })
-                }).catch(err => {
-                    res.status(400).send({
-                        success:false,
-                        message: err
-                    })
-                })
-            })    
-        } catch (error) {
-            res.status(500).send({
-                success:false,
-                message:"server error!"
-            })            
-        }
-    })
-)
+// to delete order after collecting package
+// orderRouter.delete(
+//     '',
+//     userJwt,
+//     expressAsyncHandler(async (req, res)=> {
+//         const {order_id} = req.body;
+//         try {
+//             await db.transaction(async (trx) => {
+//                 return trx('order_details')
+//                 .where({
+//                     'order_id':order_id,
+//                 }).del()
+//                 .then(async () => {
+//                     return trx('order')
+//                     .where({
+//                         'id':order_id,
+//                     }).del()
+//                     .then(() => {
+//                         res.status(200).send({
+//                             success:true,
+//                             message:"order deleted"
+//                         })
+//                     }).catch(err => {
+//                         res.status(400).send({
+//                             success:false,
+//                             message: err
+//                         })
+//                     })
+//                 }).catch(err => {
+//                     res.status(400).send({
+//                         success:false,
+//                         message: err
+//                     })
+//                 })
+//             })    
+//         } catch (error) {
+//             res.status(500).send({
+//                 success:false,
+//                 message:"server error!"
+//             })            
+//         }
+//     })
+// )
 
+//request for cancellation
 orderRouter.put(
     '/cancel/',
     userJwt,
     expressAsyncHandler(async (req, res) => {
-         
+         const { order_id, reason_cancel} = req.body;
+         try {
+             await db('order')
+             .where({
+                 user_id:req.user.id,
+                 order_id:id,
+             }).update({
+                 'req_cancel':1,
+                 reason_cancel:reason_cancel
+             }).then(() => {
+                 res.status(200).send({
+                    success:true,
+                    message:"Requested for Cancellation!"
+                 })
+             }).catch(err => {
+                res.status(400).send({
+                    success:false,
+                    message: "No such user/address exists!"
+                })
+            })
+         } catch (error) {
+            res.status(500).send({
+                success:false,
+                message:"server error"
+            })
+         }
     })
 )
 
+
+// To cancel the order after pickup
+orderRouter.put(
+    '/cancel/',
+    userJwt,
+    expressAsyncHandler(async (req, res) => {
+         const { order_id} = req.body;
+         try {
+             await db('order')
+             .where({
+                 user_id:req.user.id,
+                 order_id:id,
+             }).update({
+                 is_cancelled:1,
+                 is_refund:1
+             }).then(() => {
+                 res.status(200).send({
+                    success:true,
+                    message:"Order Cancelled!"
+                 })
+             }).catch(err => {
+                res.status(400).send({
+                    success:false,
+                    message: "No such user/address exists!"
+                })
+            })
+         } catch (error) {
+            res.status(500).send({
+                success:false,
+                message:"server error"
+            })
+         }
+    })
+)
 
 
 export default orderRouter;

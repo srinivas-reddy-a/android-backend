@@ -127,7 +127,6 @@ wishListRouter.get(
                             .where('id', element.productszs_id)
                             .select('*')
                             .then(product=>{     
-                                console.log(element)
                                 return product[0]
                             }).catch(err => {
                                 res.status(400).send({
@@ -155,21 +154,6 @@ wishListRouter.get(
                     })
                 })
             })
-            // await db('wish_list')
-            // .where('userszs_id', '=', req.user.id)
-            // .select('*')
-            // .then(products => {
-            //     console.log(products)
-            //     res.status(200).send({
-            //         success:true,
-            //         products: products
-            //     })
-            // }).catch(err => {
-            //     res.status(400).send({
-            //         success:false,
-            //         message:"db error!"
-            //     })
-            // })
         } catch (error) {
             res.status(500).send({
                 success:false,
