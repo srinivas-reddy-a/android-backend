@@ -561,7 +561,7 @@ userRouter.get(
         } catch (error) {
             res.status(500).send({
                 success:false,
-                message:'user not found db error'
+                message:'server error'
             })
         }
     })

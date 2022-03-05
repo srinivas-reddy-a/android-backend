@@ -256,15 +256,15 @@ orderRouter.get(
 
 //request for cancellation
 orderRouter.put(
-    '/cancel/',
+    '/cancel/req/',
     userJwt,
     expressAsyncHandler(async (req, res) => {
          const { order_id, reason_cancel} = req.body;
          try {
              await db('order')
              .where({
-                 user_id:req.user.id,
-                 order_id:order_id,
+                user_id:req.user.id,
+                 id:order_id,
              }).update({
                  'req_cancel':1,
                  reason_cancel:reason_cancel
@@ -299,7 +299,7 @@ orderRouter.put(
              await db('order')
              .where({
                  user_id:req.user.id,
-                 order_id:order_id,
+                 id:order_id,
              }).update({
                  is_cancelled:1,
                  is_refund:1
@@ -323,5 +323,36 @@ orderRouter.put(
     })
 )
 
+//to get cancelled items
+orderRouter.get(
+    '/all/cancel/',
+    userJwt,
+    expressAsyncHandler(async (req, res) => {
+        try {
+            await db('order')
+            .where({
+                user_id:req.user.id,
+                is_cancelled:1
+            }).select('*')
+            .then((canOrders) => {
+                console.log(req.user.id)
+                res.status(200).send({
+                    success:true,
+                    cancelled_orders:canOrders
+                })
+            }).catch(err => {
+                res.status(400).send({
+                    success:false,
+                    message:"db error"
+                })
+            })
+        } catch (error) {
+            res.status(500).send({
+                success:false,
+                message:'server error'
+            })
+        }
+    })
+)
 
 export default orderRouter;
