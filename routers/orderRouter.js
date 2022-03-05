@@ -264,7 +264,7 @@ orderRouter.put(
              await db('order')
              .where({
                  user_id:req.user.id,
-                 order_id:id,
+                 order_id:order_id,
              }).update({
                  'req_cancel':1,
                  reason_cancel:reason_cancel
@@ -299,7 +299,7 @@ orderRouter.put(
              await db('order')
              .where({
                  user_id:req.user.id,
-                 order_id:id,
+                 order_id:order_id,
              }).update({
                  is_cancelled:1,
                  is_refund:1

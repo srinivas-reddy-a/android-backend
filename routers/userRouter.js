@@ -13,7 +13,6 @@ const otp_length = process.env.OTP_LENGTH;
 const unicode = process.env.UNICODE;
 
 const userRouter = express.Router();
-
 userRouter.post(
     '/register/', 
     expressAsyncHandler(async (req, res) => {
