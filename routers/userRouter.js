@@ -763,4 +763,41 @@ userRouter.put(
     })
 )
 
+userRouter.get(
+    '/community/register/',
+    userJwt,
+    expressAsyncHandler(async (req, res) => {
+        try {
+            await db('user')
+            .where({
+                'id':req.user.id
+            }).select('is_pradhaan')
+            .then(user => {
+                if(user[0].is_pradhaan){
+                    res.status(200).send({
+                        success:true,
+                        message:"Already Registered!"
+                    })
+                }else{
+                    res.status(200).send({
+                        success:true,
+                        message:"Not Registered!"
+                    })
+                }
+                
+            }).catch(err => {
+                res.status(400).send({
+                    success:false,
+                    message:"db error"
+                })
+            })
+        } catch (error) {
+            res.status(500).send({
+                success:false,
+                message:"server error!"
+            })
+        }
+    })
+)
+
 export default  userRouter;
