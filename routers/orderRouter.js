@@ -263,7 +263,7 @@ orderRouter.put(
          try {
              await db('order')
              .where({
-                user_id:req.user.id,
+                 user_id:req.user.id,
                  id:order_id,
              }).update({
                  'req_cancel':1,
@@ -335,7 +335,6 @@ orderRouter.get(
                 is_cancelled:1
             }).select('*')
             .then((canOrders) => {
-                console.log(req.user.id)
                 res.status(200).send({
                     success:true,
                     cancelled_orders:canOrders
@@ -354,5 +353,20 @@ orderRouter.get(
         }
     })
 )
+
+// orderRouter(
+//     '/cancel/single/:id/',
+//     userJwt,
+//     expressAsyncHandler(async (req, res) => {
+//         const {order_id} = req.body;
+//         await db('order')
+//         .where({
+//             'user_id': req.user.id,
+//             id: order_id
+//         }).then((order) => {
+            
+//         })
+//     })
+// )
 
 export default orderRouter;
