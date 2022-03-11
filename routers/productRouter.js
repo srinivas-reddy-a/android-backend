@@ -279,9 +279,9 @@ productRouter.post(
 
 //to get products of particular category
 productRouter.get(
-    '/category/filter/product/',
+    '/category/filter/product/:category/',
     expressAsyncHandler(async (req, res) => {
-        const { category } = req.body;
+        const category = req.params.category;
         try {
             await db('product')
             .where({
@@ -308,9 +308,9 @@ productRouter.get(
 
 //to get products of particular brand
 productRouter.get(
-    '/brand/product/',
+    '/brand/product/:brand/',
     expressAsyncHandler(async (req, res) => {
-        const { brand } = req.body;
+        const brand = req.params.brand;
         try {
             await db('product')
             .where({
