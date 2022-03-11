@@ -25,6 +25,9 @@ productRouter.get(
                 if(req.query.name){
                     qb.where('name', 'like', `%${req.query.name}%`)
                 }
+                if(req.query.tech_name){
+                    qb.where('technical_name', 'like', `%${req.query.tech_name}%`)
+                }
                 if(req.query.category){
                     qb.where('category', '=', req.query.category)
                 }                
