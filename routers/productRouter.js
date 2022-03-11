@@ -1,8 +1,17 @@
 import express from "express";
 import expressAsyncHandler from "express-async-handler";
-import knex from "knex";
 import db from "../config/database.js";
-import userJwt from "../middleware/userMiddleware.js";
+// import { AWSTranslateJSON } from "aws-translate-json";
+
+// const awsConfig = {
+//     accessKeyId: process.env.AWS_TRANSLATE_ID,
+//     secretAccessKey: process.env.AWS_TRANSLATE_SECRET,
+//     region: process.env.AWS_TRANSLATE_REGION,
+// }
+
+// const source = "en";
+// const taget = ["hi"];
+// const { translateJSON } = new AWSTranslateJSON(awsConfig, source, taget);
 
 const productRouter = express.Router();
 
@@ -47,6 +56,12 @@ productRouter.get(
             })
             .orderBy('name', 'asc')
             .then(products => {
+                // products.forEach(p => {
+                //     console.log(p)
+                //     translateJSON({
+                //         a:"road"
+                //     }).then(console.log);
+                // })             
                 res.status(200).send({
                     success:true,
                     products:products
@@ -259,6 +274,61 @@ productRouter.post(
     })
 )
 
+//to get products of particular category
+productRouter.get(
+    '/category/filter/product/',
+    expressAsyncHandler(async (req, res) => {
+        const { category } = req.body;
+        try {
+            await db('product')
+            .where({
+                'category':category
+            }).select('*')
+            .then(products => {
+                res.status(200).send({
+                    success:true,
+                    products:products
+                })
+            }).catch(err => res.status(400).send({
+                success:false,
+                message:"db error"
+            }))
+        } catch (error) {
+            res.status(500).send({
+                success:false,
+                message:"server error"
+            })
+        }
+    })
+)
 
+
+//to get products of particular brand
+productRouter.get(
+    '/brand/product/',
+    expressAsyncHandler(async (req, res) => {
+        const { brand } = req.body;
+        try {
+            await db('product')
+            .where({
+                'brand':brand
+            }).select('*')
+            .then(products => {
+                res.status(200).send({
+                    success:true,
+                    products:products
+                })
+            }).catch(err => res.status(400).send({
+                success:false,
+                message:"db error"
+            }))
+        } catch (error) {
+            res.status(500).send({
+                success:false,
+                message:"server error"
+            })
+        }
+    })
+)
 
 export default productRouter;

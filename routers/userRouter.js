@@ -764,7 +764,7 @@ userRouter.put(
 )
 
 userRouter.get(
-    '/community/register/',
+    '/community/register/ ',
     userJwt,
     expressAsyncHandler(async (req, res) => {
         try {
