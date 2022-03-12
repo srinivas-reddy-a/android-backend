@@ -18,7 +18,7 @@ const productRouter = express.Router();
 productRouter.get(
     '/',
     expressAsyncHandler(async (req, res) => {
-
+        const limit = req.query.limit || 1000000;
         try {
             await db('product')
             .where((qb)=>{
@@ -57,6 +57,7 @@ productRouter.get(
                     .orWhere('category', 'like', `%${req.query.search}%`)
                 }
             })
+            .limit(limit)
             .orderBy('name', 'asc')
             .then(products => {
                 // products.forEach(p => {
