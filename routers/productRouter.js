@@ -19,6 +19,7 @@ productRouter.get(
     '/',
     expressAsyncHandler(async (req, res) => {
         const limit = req.query.limit || 1000000;
+        console.log(req.query.category+limit)
         try {
             await db('product')
             .where((qb)=>{
@@ -29,7 +30,7 @@ productRouter.get(
                     qb.where('technical_name', 'like', `%${req.query.technical_name}%`)
                 }
                 if(req.query.category){
-                    qb.where('category', '=', req.query.category)
+                    qb.where('category', 'like', `%${req.query.category}%`)
                 }                
                 if(req.query.crop){
                     qb.where('target_field_crops', 'like', `%${req.query.crop}%`)
