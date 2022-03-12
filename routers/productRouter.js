@@ -25,8 +25,8 @@ productRouter.get(
                 if(req.query.name){
                     qb.where('name', 'like', `%${req.query.name}%`)
                 }
-                if(req.query.tech_name){
-                    qb.where('technical_name', 'like', `%${req.query.tech_name}%`)
+                if(req.query.technical_name){
+                    qb.where('technical_name', 'like', `%${req.query.technical_name}%`)
                 }
                 if(req.query.category){
                     qb.where('category', '=', req.query.category)
@@ -282,11 +282,13 @@ productRouter.get(
     '/category/filter/product/:category/',
     expressAsyncHandler(async (req, res) => {
         const category = req.params.category;
+        const limit = req.query.limit || 1000000;
         try {
             await db('product')
             .where({
                 'category':category
             }).select('*')
+            .limit(limit)
             .then(products => {
                 res.status(200).send({
                     success:true,
@@ -311,11 +313,13 @@ productRouter.get(
     '/brand/product/:brand/',
     expressAsyncHandler(async (req, res) => {
         const brand = req.params.brand;
+        const limit = req.query.limit || 1000000;
         try {
             await db('product')
             .where({
                 'brand':brand
             }).select('*')
+            .limit(limit)
             .then(products => {
                 res.status(200).send({
                     success:true,
