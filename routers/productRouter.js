@@ -19,7 +19,6 @@ productRouter.get(
     '/',
     expressAsyncHandler(async (req, res) => {
         const limit = req.query.limit || 1000000;
-        console.log(req.query.category+limit)
         try {
             await db('product')
             .where((qb)=>{
@@ -56,6 +55,7 @@ productRouter.get(
                     .orWhere('brand', 'like', `%${req.query.search}%`)
                     .orWhere('target_disease', 'like', `%${req.query.search}%`)
                     .orWhere('category', 'like', `%${req.query.search}%`)
+                    .orWhere('technical_name', 'like', `%${req.query.technical_name}%`)
                 }
             })
             .limit(limit)
