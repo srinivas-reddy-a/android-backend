@@ -122,6 +122,7 @@ cartRouter.get(
                             .then(product=>{
                                 product[0].quantity=element.quantity
                                 product[0].volume = element.volume
+                                product[0].price = element.price
                                 return product[0]
                             }).catch(err => {
                                 res.status(400).send({
@@ -166,7 +167,8 @@ cartRouter.put(
             product_id,
             quantity,
             currentVolume,
-            updatedVolume
+            updatedVolume,
+            updatedPrice
         }  = req.body;
         try {
             await db.transaction(async trx => {
@@ -181,6 +183,7 @@ cartRouter.put(
                             product = product[0];
                             product.quantity = quantity;
                             product.volume = updatedVolume;
+                            product.price = updatedPrice;
                             return trx('cart')
                             .where({
                                 usersz_id: req.user.id,
@@ -188,7 +191,8 @@ cartRouter.put(
                                 volume:currentVolume
                             }).update({
                                 quantity:quantity,
-                                volume:updatedVolume
+                                volume:updatedVolume,
+                                price:updatedPrice
                             }).then(product => {
                                 res.status(201).send({
                                     success: true,
