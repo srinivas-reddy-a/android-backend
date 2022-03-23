@@ -167,8 +167,7 @@ cartRouter.put(
             product_id,
             quantity,
             currentVolume,
-            updatedVolume,
-            updatedPrice
+            updatedVolume
         }  = req.body;
         try {
             await db.transaction(async trx => {
@@ -183,7 +182,6 @@ cartRouter.put(
                             product = product[0];
                             product.quantity = quantity;
                             product.volume = updatedVolume;
-                            product.price = updatedPrice;
                             return trx('cart')
                             .where({
                                 usersz_id: req.user.id,
@@ -191,8 +189,7 @@ cartRouter.put(
                                 volume:currentVolume
                             }).update({
                                 quantity:quantity,
-                                volume:updatedVolume,
-                                price:updatedPrice
+                                volume:updatedVolume
                             }).then(product => {
                                 res.status(201).send({
                                     success: true,
