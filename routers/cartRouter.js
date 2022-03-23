@@ -52,7 +52,8 @@ cartRouter.post(
         const {
             product_id,
             quantity,
-            volume
+            volume,
+            price
         }  = req.body;
         try {
             await db.transaction(async trx=>{
@@ -73,7 +74,8 @@ cartRouter.post(
                             'usersz_id':req.user.id,
                             'product_id':product_id,
                             'quantity':quantity,
-                            'volume':volume
+                            'volume':volume,
+                            'price':price
                         }).then(product => {
                             res.status(201).send({
                                 success:true,
