@@ -369,6 +369,7 @@ userRouter.post(
             })
             .then(()=>{
                 res.status(200).send({
+                    success:true,
                     message:"Logged out!"
                 })
             })
