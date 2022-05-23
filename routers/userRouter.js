@@ -17,7 +17,7 @@ userRouter.post(
     '/register/', 
     expressAsyncHandler(async (req, res) => {
         const { phoneNumber} = req.body;
-        const existingUser = false;
+        let existingUser = false;
         try {
             await db('user').where('phone_number', phoneNumber).select('id')
             .then(async user => {
@@ -71,7 +71,7 @@ userRouter.post(
     '/register/otp/resend/',
     expressAsyncHandler(async (req, res) => {
         const { phoneNumber} = req.body;
-        const existingUser = false;
+        let existingUser = false;
         try {
             await db('user').where('phone_number', phoneNumber).select('id')
             .then(async user => {
