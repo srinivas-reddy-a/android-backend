@@ -125,7 +125,7 @@ userRouter.post(
 userRouter.post(
     '/register/otp/',
     expressAsyncHandler(async (req, res) => {
-        const { phoneNumber,otp } = req.body;
+        const { phoneNumber, otp, existingUser } = req.body;
         await axios.get(`https://api.msg91.com/api/v5/otp/verify?authkey=${authkey}&mobile=91${phoneNumber}&otp=${otp}`)
         .then(response =>{
             if(response.data.type==="success"){
@@ -143,18 +143,37 @@ userRouter.post(
                         jwt.sign(payload, "jwtsecret", 
                         (err, token) => {
                             if(err) throw err
-                            db('user')
-                            .insert({
-                                'id':id[0].id+1,
-                                'phone_number':phoneNumber,
-                                'token':token
-                            })
-                            .then(user => {
-                                res.status(200).send({
-                                    success: true,
-                                    token: token
-                                })
-                            })
+                            if(existingUser){
+                                db('user')
+                                    .where('phone_number', phoneNumber)
+                                    .update({
+                                        'token':token
+                                    })
+                                    .then(user => {
+                                        res.status(200).send({
+                                            success: true,
+                                            token: token
+                                        })
+                                    })
+                                    .catch(err => {
+                                        res.status(400).send("db error")
+                                    })  
+                            }else{
+                                db('user')
+                                .insert({
+                                    'id':id[0].id+1,
+                                    'phone_number':phoneNumber,
+                                    'token':token
+                                }).then(user => {
+                                    res.status(200).send({
+                                        success: true,
+                                        token: token
+                                    })
+                                }).catch(err => {
+                                    res.status(400).send("db error")
+                                })  
+                            }
+                           
                         
                         })
                     })
