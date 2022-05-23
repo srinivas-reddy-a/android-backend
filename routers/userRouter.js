@@ -27,37 +27,40 @@ userRouter.post(
                     //     message:"user already exists with the number!"
                     // })
                     existingUser = true;
-                }else{
-                    await axios.get(`https://api.msg91.com/api/v5/otp?template_id=${msg91_template_id}&mobile=91${phoneNumber}&authkey=${authkey}&otp_length=${otp_length}&unicode=${unicode}`)
-                    .then(response => {
-                        if(response.data.type === "success"){
-                            res.status(200).send({
-                                success:true,
-                                existingUser:existingUser,
-                                message:"enter otp"
-                            })
-                        }else{
-                            res.status(400).send({
-                                success:false,
-                                message:"otp error"
-                            })
-                        }
-                    }).catch(err => {
+                }
+                await axios.get(`https://api.msg91.com/api/v5/otp?template_id=${msg91_template_id}&mobile=91${phoneNumber}&authkey=${authkey}&otp_length=${otp_length}&unicode=${unicode}`)
+                .then(response => {
+                    if(response.data.type === "success"){
+                        res.status(200).send({
+                            success:true,
+                            existingUser:existingUser,
+                            message:"enter otp"
+                        })
+                    }else{
                         res.status(400).send({
                             success:false,
+                            existingUser:existingUser,
                             message:"otp error"
                         })
+                    }
+                }).catch(err => {
+                    res.status(400).send({
+                        success:false,
+                        existingUser:existingUser,
+                        message:"otp error"
                     })
-                }
+                })
             }).catch(err => {
                 res.status(400).send({
                     success:false,
+                    existingUser:existingUser,
                     message:"data error"
                 })
             })
         } catch (error) {
             res.status(500).send({
                 success:false,
+                existingUser:existingUser,
                 message:"server error"
             })
         }
@@ -68,44 +71,50 @@ userRouter.post(
     '/register/otp/resend/',
     expressAsyncHandler(async (req, res) => {
         const { phoneNumber} = req.body;
+        const existingUser = false;
         try {
             await db('user').where('phone_number', phoneNumber).select('id')
             .then(async user => {
                 if(user.length){
-                    res.status(400).send({
-                        success:false,
-                        err:"user already exists with the number!"
-                    })
-                }else{
-                    await axios.get(`https://api.msg91.com/api/v5/otp/retry?authkey=${authkey}&retrytype=text&mobile=91${phoneNumber}`)
-                    .then(response => {
-                        if(response.data.type === "success"){
-                            res.status(200).send({
-                                success:true,
-                                message:"enter otp"
-                            })
-                        }else{
-                            res.status(400).send({
-                                success:false,
-                                message:"otp error"
-                            })
-                        }
-                    }).catch(err => {
+                    // res.status(400).send({
+                    //     success:false,
+                    //     err:"user already exists with the number!"
+                    // })
+                    existingUser = true;
+                }
+                await axios.get(`https://api.msg91.com/api/v5/otp/retry?authkey=${authkey}&retrytype=text&mobile=91${phoneNumber}`)
+                .then(response => {
+                    if(response.data.type === "success"){
+                        res.status(200).send({
+                            success:true,
+                            existingUser:existingUser,
+                            message:"enter otp"
+                        })
+                    }else{
                         res.status(400).send({
                             success:false,
+                            existingUser:existingUser,
                             message:"otp error"
                         })
+                    }
+                }).catch(err => {
+                    res.status(400).send({
+                        success:false,
+                        existingUser:existingUser,
+                        message:"otp error"
                     })
-                }
+                })
             }).catch(err => {
                 res.status(400).send({
                     success:false,
+                    existingUser:existingUser,
                     message:"data error"
                 })
             })
         } catch (error) {
             res.status(500).send({
                 success:false,
+                existingUser:existingUser,
                 message:"server error"
             })
         }
