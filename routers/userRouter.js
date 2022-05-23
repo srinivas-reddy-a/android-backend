@@ -17,20 +17,23 @@ userRouter.post(
     '/register/', 
     expressAsyncHandler(async (req, res) => {
         const { phoneNumber} = req.body;
+        const existingUser = false;
         try {
             await db('user').where('phone_number', phoneNumber).select('id')
             .then(async user => {
                 if(user.length){
-                    res.status(400).send({
-                        success:false,
-                        err:"user already exists with the number!"
-                    })
+                    // res.status(400).send({
+                    //     success:false,
+                    //     message:"user already exists with the number!"
+                    // })
+                    existingUser = true;
                 }else{
                     await axios.get(`https://api.msg91.com/api/v5/otp?template_id=${msg91_template_id}&mobile=91${phoneNumber}&authkey=${authkey}&otp_length=${otp_length}&unicode=${unicode}`)
                     .then(response => {
                         if(response.data.type === "success"){
                             res.status(200).send({
                                 success:true,
+                                existingUser:existingUser,
                                 message:"enter otp"
                             })
                         }else{
