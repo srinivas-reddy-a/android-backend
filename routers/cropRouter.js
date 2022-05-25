@@ -32,7 +32,7 @@ cropRouter.get(
 
 //get cropwise categories
 cropRouter.get(
-    '/:crop/product/',
+    '/:crop/category/',
     expressAsyncHandler(async (req, res) => {
         const limit = req.query.limit || 1000000;
         const crop = req.params.crop;
@@ -71,7 +71,7 @@ cropRouter.get(
 
 //get cropwise categorywise product
 cropRouter.get(
-    '/:crop/product/category/:category',
+    '/:crop/category/:category/product',
     expressAsyncHandler(async (req, res) => {
         const limit = req.query.limit || 1000000;
         const crop = req.params.crop;
