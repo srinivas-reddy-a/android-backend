@@ -51,16 +51,10 @@ cropRouter.get(
             .select('id', 'category')
             .limit(limit)
             .orderBy(orderby, order)
-            .then(categories => {
-                // products.forEach(p => {
-                //     console.log(p)
-                //     translateJSON({
-                //         a:"road"
-                //     }).then(console.log);
-                // })             
+            .then(categories => {            
                 res.status(200).send({
                     success:true,
-                    categories:categories
+                    cwcategories:categories
                 })
             })
             .catch(err => res.status(400).send({
