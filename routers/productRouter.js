@@ -19,6 +19,8 @@ productRouter.get(
     '/',
     expressAsyncHandler(async (req, res) => {
         const limit = req.query.limit || 1000000;
+        const orderby = req.query.orderby || 'name';
+        const order = req.query.order || 'desc';
         try {
             await db('product')
             .where((qb)=>{
@@ -59,7 +61,7 @@ productRouter.get(
                 }
             })
             .limit(limit)
-            .orderBy('name', 'asc')
+            .orderBy(orderby, order)
             .then(products => {
                 // products.forEach(p => {
                 //     console.log(p)
