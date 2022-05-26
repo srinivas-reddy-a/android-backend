@@ -15,6 +15,7 @@ import db from "../config/database.js";
 
 const productRouter = express.Router();
 
+//get all products and filter or search products
 productRouter.get(
     '/',
     expressAsyncHandler(async (req, res) => {
@@ -57,7 +58,7 @@ productRouter.get(
                     .orWhere('brand', 'like', `%${req.query.search}%`)
                     .orWhere('target_disease', 'like', `%${req.query.search}%`)
                     .orWhere('category', 'like', `%${req.query.search}%`)
-                    .orWhere('technical_name', 'like', `%${req.query.technical_name}%`)
+                    .orWhere('technical_name', 'like', `%${req.query.search}%`)
                 }
             })
             .limit(limit)
