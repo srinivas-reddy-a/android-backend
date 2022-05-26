@@ -62,13 +62,7 @@ productRouter.get(
             })
             .limit(limit)
             .orderBy(orderby, order)
-            .then(products => {
-                // products.forEach(p => {
-                //     console.log(p)
-                //     translateJSON({
-                //         a:"road"
-                //     }).then(console.log);
-                // })             
+            .then(products => {      
                 res.status(200).send({
                     success:true,
                     products:products
