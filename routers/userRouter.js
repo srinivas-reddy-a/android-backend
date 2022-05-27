@@ -131,7 +131,6 @@ userRouter.post(
                     .orderBy('id', 'desc')
                     .limit(1)
                     .then(async (id) => {
-
                         if(existingUser){
                             const payload = {
                                 user: {
@@ -158,8 +157,11 @@ userRouter.post(
                                 })  
                             })
                         }else{
-                            await db.transaction(async trx => {
-                                return trx('user')
+                            //transaction not working as the children
+                            //of trx will be inside token async
+                            //function
+                            // await db.transaction(async trx => {
+                                await db('user')
                                 .where('phone_number', phoneNumber)
                                 .then(async user => {
                                     if(user.length){
@@ -171,7 +173,7 @@ userRouter.post(
                                         jwt.sign(payload, "jwtsecret", 
                                         async (err, token) => {
                                             if(err) throw err        
-                                            return trx('user')
+                                            await db('user')
                                             .where('phone_number', phoneNumber)
                                             .update({
                                                 'token':token,
@@ -195,10 +197,10 @@ userRouter.post(
                                         }
                                         jwt.sign(payload, "jwtsecret", 
                                         async (err, token) => {
-                                            if(err) throw err        
-                                            return trx('user')
+                                            if(err) throw err   
+                                            await db('user')
                                                 .insert({
-                                                    'id':id[0].id+1,
+                                                    'id':payload.user.id,
                                                     'phone_number':phoneNumber,
                                                     'token':token,
                                                     'created_at':new Date(),
@@ -209,12 +211,15 @@ userRouter.post(
                                                         token: token
                                                     })
                                                 }).catch(err => {
-                                                    res.status(400).send(err)
+                                                    res.status(400).send({
+                                                        success: false,
+                                                        message: err
+                                                    })
                                                 })
                                         })
                                     }
                                 })
-                            })
+                            // })
                               
                         }
                     })
