@@ -36,7 +36,7 @@ cropRouter.get(
     expressAsyncHandler(async (req, res) => {
         const limit = req.query.limit || 1000000;
         const crop = req.params.crop;
-        const orderby = req.query.orderby || 'category';
+        const orderby = req.query.orderby || 'name';
         const order = req.query.order || 'asc';
         try {
             await db('product')
