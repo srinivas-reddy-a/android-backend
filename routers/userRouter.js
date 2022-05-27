@@ -22,10 +22,6 @@ userRouter.post(
             await db('user').where('phone_number', phoneNumber).select('id')
             .then(async user => {
                 if(user.length){
-                    // res.status(400).send({
-                    //     success:false,
-                    //     message:"user already exists with the number!"
-                    // })
                     existingUser = true;
                 }
                 await axios.get(`https://api.msg91.com/api/v5/otp?template_id=${msg91_template_id}&mobile=91${phoneNumber}&authkey=${authkey}&otp_length=${otp_length}&unicode=${unicode}`)
@@ -141,7 +137,7 @@ userRouter.post(
                             }
                         }
                         jwt.sign(payload, "jwtsecret", 
-                        (err, token) => {
+                        async (err, token) => {
                             if(err) throw err
                             if(existingUser){
                                 db('user')
@@ -156,28 +152,54 @@ userRouter.post(
                                         })
                                     })
                                     .catch(err => {
-                                        res.status(400).send("db error")
+                                        res.status(400).send(err)
                                     })  
                             }else{
-                                db('user')
-                                .insert({
-                                    'id':id[0].id+1,
-                                    'phone_number':phoneNumber,
-                                    'token':token
-                                }).then(user => {
-                                    res.status(200).send({
-                                        success: true,
-                                        token: token
+                                await db.transaction(async trx => {
+                                    return trx('user')
+                                    .where('phone_number', phoneNumber)
+                                    .then(async user => {
+                                        if(user.length){
+                                            return trx('user')
+                                            .where('phone_number', phoneNumber)
+                                            .update({
+                                                'token':token,
+                                                'last_signed_in_at':new Date()
+                                            })
+                                            .then(user => {
+                                                res.status(200).send({
+                                                    success: true,
+                                                    token: token
+                                                })
+                                            })
+                                            .catch(err => {
+                                                res.status(400).send(err)
+                                            }) 
+                                        }else{
+                                            return trx('user')
+                                                .insert({
+                                                    'id':id[0].id+1,
+                                                    'phone_number':phoneNumber,
+                                                    'token':token,
+                                                    'created_at':new Date()
+                                                }).then(user => {
+                                                    res.status(200).send({
+                                                        success: true,
+                                                        token: token
+                                                    })
+                                                }).catch(err => {
+                                                    res.status(400).send(err)
+                                                })
+                                        }
                                     })
-                                }).catch(err => {
-                                    res.status(400).send("db error")
-                                })  
+                                })
+                                  
                             }
                            
                         
                         })
                     })
-                    .catch(err => res.status(400).send("db error"))
+                    .catch(err => res.status(400).send(err))
                 } catch (error) {
                     res.status(500).send({
                         success:false,
