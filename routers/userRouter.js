@@ -181,7 +181,8 @@ userRouter.post(
                                                     'id':id[0].id+1,
                                                     'phone_number':phoneNumber,
                                                     'token':token,
-                                                    'created_at':new Date()
+                                                    'created_at':new Date(),
+                                                    'last_signed_in_at':new Date()
                                                 }).then(user => {
                                                     res.status(200).send({
                                                         success: true,
@@ -484,12 +485,11 @@ userRouter.put(
                         phone_number:user.phone_number,
                         email: user.email,
                         name: user.name,
-
-                    }).then((user) => {
-                        
+                        modified_at:new Date()
+                    }).then(() => {
                         res.status(201).send({
                             success: true,
-                            user: user
+                            message: "Profile Updated!"
                         });
                     })
                     
