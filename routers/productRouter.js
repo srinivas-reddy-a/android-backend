@@ -170,6 +170,7 @@ productRouter.get(
             await db
             .select()
             .table('category')
+            .orderBy('name', 'asc')
             .then(categories => {
                 res.status(200).send({
                     success:true,
