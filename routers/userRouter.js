@@ -130,36 +130,47 @@ userRouter.post(
                     .from('user')
                     .orderBy('id', 'desc')
                     .limit(1)
-                    .then(id => {
-                        const payload = {
-                            user: {
-                                id: id[0].id+1
+                    .then(async (id) => {
+
+                        if(existingUser){
+                            const payload = {
+                                user: {
+                                    id:id[0].id
+                                }
                             }
-                        }
-                        jwt.sign(payload, "jwtsecret", 
-                        async (err, token) => {
-                            if(err) throw err
-                            if(existingUser){
+                            jwt.sign(payload, "jwtsecret", 
+                            async (err, token) => {
+                                if(err) throw err                               
                                 db('user')
-                                    .where('phone_number', phoneNumber)
-                                    .update({
-                                        'token':token
+                                .where('phone_number', phoneNumber)
+                                .update({
+                                    'token':token,
+                                    'last_signed_in_at':new Date()
+                                })
+                                .then(user => {
+                                    res.status(200).send({
+                                        success: true,
+                                        token: token
                                     })
-                                    .then(user => {
-                                        res.status(200).send({
-                                            success: true,
-                                            token: token
-                                        })
-                                    })
-                                    .catch(err => {
-                                        res.status(400).send(err)
-                                    })  
-                            }else{
-                                await db.transaction(async trx => {
-                                    return trx('user')
-                                    .where('phone_number', phoneNumber)
-                                    .then(async user => {
-                                        if(user.length){
+                                })
+                                .catch(err => {
+                                    res.status(400).send(err)
+                                })  
+                            })
+                        }else{
+                            await db.transaction(async trx => {
+                                return trx('user')
+                                .where('phone_number', phoneNumber)
+                                .then(async user => {
+                                    if(user.length){
+                                        const payload = {
+                                            user: {
+                                                id:id[0].id
+                                            }
+                                        }
+                                        jwt.sign(payload, "jwtsecret", 
+                                        async (err, token) => {
+                                            if(err) throw err        
                                             return trx('user')
                                             .where('phone_number', phoneNumber)
                                             .update({
@@ -175,7 +186,16 @@ userRouter.post(
                                             .catch(err => {
                                                 res.status(400).send(err)
                                             }) 
-                                        }else{
+                                        })
+                                    }else{
+                                        const payload = {
+                                            user: {
+                                                id:id[0].id+1
+                                            }
+                                        }
+                                        jwt.sign(payload, "jwtsecret", 
+                                        async (err, token) => {
+                                            if(err) throw err        
                                             return trx('user')
                                                 .insert({
                                                     'id':id[0].id+1,
@@ -191,14 +211,12 @@ userRouter.post(
                                                 }).catch(err => {
                                                     res.status(400).send(err)
                                                 })
-                                        }
-                                    })
+                                        })
+                                    }
                                 })
-                                  
-                            }
-                           
-                        
-                        })
+                            })
+                              
+                        }
                     })
                     .catch(err => res.status(400).send(err))
                 } catch (error) {
@@ -225,7 +243,7 @@ userRouter.post(
         try {
             const payload = {
                 user: {
-                    id: 1
+                    id:req.user.id
                 }
             }
             jwt.sign(payload, "jwtsecret", 
@@ -372,14 +390,14 @@ userRouter.post(
                 try {
                     const payload = {
                         user: {
-                            id: id
+                            phoneNumber:phoneNumber
                         }
                     }
                     jwt.sign(payload, "jwtsecret", 
                     (err, token) => {
                         if(err) throw err
                         db('user')
-                        .where('id', id)
+                        .where('phone_Number', phoneNumber)
                         .update({
                             'token':token
                         })
