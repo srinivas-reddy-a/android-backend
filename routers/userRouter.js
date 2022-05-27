@@ -441,7 +441,8 @@ userRouter.get(
     userJwt,
     expressAsyncHandler(async (req, res) => {
         try {
-            await db('user').where('id', req.user.id).select('phone_number')
+            await db('user').where('id', req.user.id)
+            .select('phone_number', 'name', 'email')
             .then(user => {
                 res.status(200).send({
                     success:true,
@@ -510,7 +511,6 @@ userRouter.put(
         
     })
 )
-
 
 userRouter.post(
     '/address/',
