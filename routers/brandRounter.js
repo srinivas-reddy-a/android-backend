@@ -18,8 +18,8 @@ brandRouter.get(
                 })
             })
             .catch(err => res.status(400).send({
-                success:false,
-                message:err
+                success: false,
+                message: "db error"
             }))
         } catch (error) {
             res.status(500).send({
@@ -44,9 +44,9 @@ brandRouter.get(
                 })
             })
             .catch(err => {
-                res.status(500).send({
+                res.status(400).send({
                     success:false,
-                    message:'brandd not found db error'
+                    message:'db error'
                 })
             })
         } catch (error) {

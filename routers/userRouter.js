@@ -153,7 +153,10 @@ userRouter.post(
                                     })
                                 })
                                 .catch(err => {
-                                    res.status(400).send(err)
+                                    res.status(400).send({
+                                        success: false,
+                                        message: "db error"
+                                    })
                                 })  
                             })
                         }else{
@@ -186,7 +189,10 @@ userRouter.post(
                                                 })
                                             })
                                             .catch(err => {
-                                                res.status(400).send(err)
+                                                res.status(400).send({
+                                                    success: false,
+                                                    message: "db error"
+                                                })
                                             }) 
                                         })
                                     }else{
@@ -213,7 +219,7 @@ userRouter.post(
                                                 }).catch(err => {
                                                     res.status(400).send({
                                                         success: false,
-                                                        message: err
+                                                        message: "db error"
                                                     })
                                                 })
                                         })
@@ -223,7 +229,12 @@ userRouter.post(
                               
                         }
                     })
-                    .catch(err => res.status(400).send(err))
+                    .catch(err => {
+                        res.status(400).send({
+                            success:false,
+                            message:'db error'
+                            })
+                    })
                 } catch (error) {
                     res.status(500).send({
                         success:false,
@@ -280,10 +291,10 @@ userRouter.get(
             })
         })
         .catch(err => {
-            res.status(500).send({
+            res.status(400).send({
                 success:false,
-                message:'user not found db error'
-            })
+                message:'db error'
+                })
         })
         
     } catch (error) {
@@ -322,10 +333,12 @@ userRouter.post(
                 res.status(400).send("User not registered! Go register");
             }
 
-        }).catch(err => res.status(500).send({
-            success:true,
-            message:"db error"
-        }))
+        }).catch(err => {
+            res.status(400).send({
+                success:false,
+                message:'db error'
+                })
+        })
     } catch (error) {
         res.status(500).send({
             success:false,
@@ -473,9 +486,9 @@ userRouter.get(
                 })
             })
             .catch(err => {
-                res.status(500).send({
+                res.status(400).send({
                     success:false,
-                    message:'user not found db error'
+                    message:'db error'
                 })
             })
             
@@ -527,10 +540,12 @@ userRouter.put(
             .then(trx.commit)
             .catch(trx.rollback);
         })
-        .catch(err => res.status(400).send({
-            success: false,
-            message: err
-        }))
+        .catch(err => {
+            res.status(400).send({
+                success:false,
+                message:'db error'
+            })
+        })
         
     })
 )

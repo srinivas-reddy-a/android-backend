@@ -7,6 +7,7 @@ import wishListRouter from "./routers/wishListRouterr.js";
 import brandRouter from "./routers/brandRounter.js";
 import inventoryRouter from "./routers/inventoryRouter.js";
 import cropRouter from "./routers/cropRouter.js";
+import bugRouter from "./routers/bugRouter.js";
 
 import cors from "cors";
 
@@ -25,6 +26,7 @@ app.use('/api/cart/', cartRouter);
 app.use('/api/wishlist/', wishListRouter);
 app.use('/api/inventory/', inventoryRouter);
 app.use('/api/crop/', cropRouter);
+app.use('/api/bug/', bugRouter);
 
 app.use((err, req, res, next) => {
     res.status(500).send({ message: err.message });

@@ -31,7 +31,7 @@ cartRouter.post(
             }).catch(err => {
                 res.status(400).send({
                     success:false,
-                    message: err
+                    message:'db error'
                 })
             })
         } catch (error) {
@@ -84,14 +84,14 @@ cartRouter.post(
                         }).catch(err => {
                             res.status(400).send({
                                 success:false,
-                                message: err
+                                message:'db error'
                             })
                         })
                     }
                 }).catch(err => {
                     res.status(400).send({
                         success:false,
-                        message: err
+                        message:'db error'
                     })
                 })
             })
@@ -127,7 +127,7 @@ cartRouter.get(
                             }).catch(err => {
                                 res.status(400).send({
                                     success:false,
-                                    message: "No such user/address exists!"
+                                    message:'db error'
                                 })
                             })
                         });
@@ -146,7 +146,7 @@ cartRouter.get(
                 }).catch(err => {
                     res.status(400).send({
                         success:false,
-                        message: "No such user/address exists!"
+                        message:'db error'
                     })
                 })
             })
@@ -204,10 +204,12 @@ cartRouter.put(
                         }
                     }).then(trx.commit)
                     .catch(trx.rollback);
-                }).catch(err => res.status(400).send({
-                    success: false,
-                    message: err
-                }))
+                }).catch(err =>  {
+                    res.status(400).send({
+                        success:false,
+                        message:'db error'
+                    })
+                })
         } catch (error) {
             res.status(500).send({
                 success:false,
@@ -241,7 +243,7 @@ cartRouter.delete(
             }).catch(err => {
                 res.status(400).send({
                     success:false,
-                    message: "No such user/product exists!"
+                    message:'db error'
                 })
             })
         } catch (error) {

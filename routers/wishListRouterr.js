@@ -29,7 +29,7 @@ wishListRouter.post(
             }).catch(err => {
                 res.status(400).send({
                     success:false,
-                    message: err
+                    message:'db error'
                 })
             })
         } catch (error) {
@@ -75,14 +75,14 @@ wishListRouter.post(
                         }).catch(err => {
                             res.status(400).send({
                                 success:false,
-                                message: err
+                                message:'db error'
                             })
                         })
                     }
                 }).catch(err => {
                     res.status(400).send({
                         success:false,
-                        message: err
+                        message:'db error'
                     })
                 })
             })
@@ -97,10 +97,10 @@ wishListRouter.post(
             //         message:"Successfully added!"
             //     })
             // }).catch(err => {
-            //     res.status(400).send({
-            //         success:false,
-            //         message: err
-            //     })
+            //    res.status(400).send({
+            //     success:false,
+            //     message:'db error'
+            // })
             // })
         } catch (error) {
             res.status(500).send({
@@ -201,10 +201,12 @@ wishListRouter.put(
                         }
                     }).then(trx.commit)
                     .catch(trx.rollback);
-                }).catch(err => res.status(400).send({
-                    success: false,
-                    message: err
-                }))
+                }).catch(err => {
+                    res.status(400).send({
+                        success:false,
+                        message:'db error'
+                    })
+                })
         } catch (error) {
             res.status(500).send({
                 success:false,

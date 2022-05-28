@@ -74,8 +74,8 @@ orderRouter.post(
             }).catch(err => {
                 res.status(400).send({
                     success:false,
-                    message: err
-                })
+                    message:'db error'
+                    })
             })
         } catch (error) {
             res.status(500).send({
@@ -179,8 +179,8 @@ orderRouter.get(
                             }).catch(err => {
                                 res.status(400).send({
                                     success:false,
-                                    message: "No such user/address exists!"
-                                })
+                                    message:'db error'
+                                    })
                             })
                         });
                         const products = await Promise.all(promises)
@@ -197,8 +197,8 @@ orderRouter.get(
                 }).catch(err => {
                     res.status(400).send({
                         success:false,
-                        message: "No such user/address exists!"
-                    })
+                        message:'db error'
+                        })
                 })
             })
         } catch (error) {
