@@ -555,8 +555,8 @@ userRouter.post(
     userJwt,
     expressAsyncHandler(async (req, res) => {
         const { 
-            address_name,
-            address,
+            addressName,
+            addressLine1,
             city,
             postalCode,
             state,
@@ -565,9 +565,9 @@ userRouter.post(
         try {
             await db('user_address')
             .insert({
-                'address_name':address_name,
+                'address_name':addressName,
                 'user_id': req.user.id, 
-                'address_line1':address,
+                'address_line1':addressLine1,
                 'postal_code':postalCode,
                 'phone_number':phoneNumber,
                 state,
@@ -666,7 +666,7 @@ userRouter.put(
     userJwt,
     expressAsyncHandler(async (req, res) => {
         try {
-            const {id} = req.user.id;
+            const id = req.user.id;
             await db.transaction(async trx => {
                 return trx('user_address')
                 .where({
@@ -674,20 +674,20 @@ userRouter.put(
                 }).then(async address => {
                     if(address.length){
                         address=address[0];
-                        address.address_name= req.body.address_name || address.address_name;
-                        address.addressLine1 = req.body.addressLine1 || address.addressLine1;
+                        address.address_name= req.body.addressName || address.address_name;
+                        address.address_line1 = req.body.addressLine1 || address.addressLine1;
                         address.city = req.body.city || address.city;
-                        address.postal_code = req.body.postal_code || address.postal_code;
+                        address.postal_code = req.body.postalCode || address.postal_code;
                         address.state = req.body.state || address.state;
-                        address.phone_number = req.body.phone_number || address.phone_number;
+                        address.phone_number = req.body.phoneNumber || address.phone_number;
                         return trx('user_address')
                         .where({
-                            id:id
+                            user_id:id
                         }).update({
                             'address_name':address.address_name,
-                            'address_line1':address.addressLine1,
-                            'postal_code':address.postalCode,
-                            'phone_number':address.phoneNumber,
+                            'address_line1':address.address_line1,
+                            'postal_code':address.postal_code,
+                            'phone_number':address.phone_number,
                             'state':address.state,
                             'city':address.city,
                         }).then((address)=>{
