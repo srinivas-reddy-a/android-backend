@@ -8,8 +8,10 @@ import brandRouter from "./routers/brandRounter.js";
 import inventoryRouter from "./routers/inventoryRouter.js";
 import cropRouter from "./routers/cropRouter.js";
 import bugRouter from "./routers/bugRouter.js";
+import kycRouter from "./routers/kycRouter.js";
 
 import cors from "cors";
+import multer from "multer";
 
 const PORT = process.env.PORT || 3000;
 const app = express();
@@ -27,9 +29,33 @@ app.use('/api/wishlist/', wishListRouter);
 app.use('/api/inventory/', inventoryRouter);
 app.use('/api/crop/', cropRouter);
 app.use('/api/bug/', bugRouter);
+app.use('/api/kyc/', kycRouter);
 
 app.use((err, req, res, next) => {
-    res.status(500).send({ message: err.message });
+  if(err instanceof multer.MulterError){
+    if(err.code === "LIMIT_FILE_SIZE" ){
+      res.status(500).send({
+        succcess:false,
+        message:"File is too large!"
+      })
+    }
+    if(err.code === "LIMIT_FILE_COUNT"){
+      res.status(500).send({
+        success:false,
+        message:"File limit reached!"
+      })
+    }
+    if(err.code === "LIMIT_UNEXPECTED_FILE"){
+      res.status(500).send({
+        success:true,
+        message:"File must be an image!"
+      })
+    }
+  }
+    res.status(500).send({
+      succcess:false,
+      message: err.message
+    });
   });
 
 app.listen(PORT);

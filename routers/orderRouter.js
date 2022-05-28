@@ -234,15 +234,15 @@ orderRouter.get(
 //                         })
 //                     }).catch(err => {
 //                         res.status(400).send({
-//                             success:false,
-//                             message: err
-//                         })
+                    // success:false,
+                    // message:'db error'
+                    // })
 //                     })
 //                 }).catch(err => {
 //                     res.status(400).send({
-//                         success:false,
-//                         message: err
-//                     })
+                    // success:false,
+                    // message:'db error'
+                    // })
 //                 })
 //             })    
 //         } catch (error) {
@@ -276,8 +276,8 @@ orderRouter.put(
              }).catch(err => {
                 res.status(400).send({
                     success:false,
-                    message: "No such user/address exists!"
-                })
+                    message:'db error'
+                    })
             })
          } catch (error) {
             res.status(500).send({
@@ -311,7 +311,7 @@ orderRouter.put(
              }).catch(err => {
                 res.status(400).send({
                     success:false,
-                    message: "No such user/address exists!"
+                    message:'db error'
                 })
             })
          } catch (error) {

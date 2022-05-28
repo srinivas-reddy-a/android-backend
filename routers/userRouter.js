@@ -585,8 +585,8 @@ userRouter.post(
                 })
             }).catch(err => {
                 res.status(400).send({
-                    success: true,
-                    message: err
+                    success:false,
+                    message:'db error'
                 })
             })
         } catch (error) {
@@ -702,7 +702,7 @@ userRouter.put(
                         }).catch(err => {
                             res.status(400).send({
                                 success:false,
-                                message: "No such user/address exists!"
+                                message:'db error'
                             })
                         })
                     }
@@ -892,4 +892,4 @@ userRouter.get(
     })
 )
 
-export default  userRouter;
+export default userRouter;

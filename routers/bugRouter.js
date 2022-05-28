@@ -17,9 +17,22 @@ bugRouter.post(
                 'userzsz_id':userzsz_id,
                 'bug_detail':bug_detail,
                 'created_at':new Date()
+            }).then(() => {
+                res.status(200).send({
+                    success:true,
+                    message:"Reported bug!"
+                })
+            }).catch(err =>{
+                res.status(400).send({
+                    success: false,
+                    message:"db error"
+                })
             })
         } catch (error) {
-            
+            res.status(500).send({
+                success:false,
+                message:"internal error"
+            });
         }
     })
 )
