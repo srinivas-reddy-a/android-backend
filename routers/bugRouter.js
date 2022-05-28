@@ -20,7 +20,7 @@ bugRouter.post(
             }).then(() => {
                 res.status(200).send({
                     success:true,
-                    message:"Reported bug!"
+                    message:"Thank you for your time,bug Reported!"
                 })
             }).catch(err =>{
                 res.status(400).send({
