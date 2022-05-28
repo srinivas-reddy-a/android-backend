@@ -555,21 +555,21 @@ userRouter.post(
     userJwt,
     expressAsyncHandler(async (req, res) => {
         const { 
-            addressName,
-            addressLine1,
+            address_name,
+            address_line1,
             city,
-            postalCode,
+            postal_code,
             state,
-            phoneNumber,
+            phone_number,
         } = req.body;
         try {
             await db('user_address')
             .insert({
-                'address_name':addressName,
+                'address_name':address_name,
                 'user_id': req.user.id, 
-                'address_line1':addressLine1,
-                'postal_code':postalCode,
-                'phone_number':phoneNumber,
+                'address_line1':address_line1,
+                'postal_code':postal_code,
+                'phone_number':phone_number,
                 state,
                 city
             }).then((address) => {
@@ -674,12 +674,12 @@ userRouter.put(
                 }).then(async address => {
                     if(address.length){
                         address=address[0];
-                        address.address_name= req.body.addressName || address.address_name;
-                        address.address_line1 = req.body.addressLine1 || address.addressLine1;
+                        address.address_name= req.body.address_name || address.address_name;
+                        address.address_line1 = req.body.address_line1 || address.address_line1;
                         address.city = req.body.city || address.city;
-                        address.postal_code = req.body.postalCode || address.postal_code;
+                        address.postal_code = req.body.postal_code || address.postal_code;
                         address.state = req.body.state || address.state;
-                        address.phone_number = req.body.phoneNumber || address.phone_number;
+                        address.phone_number = req.body.phone_number || address.phone_number;
                         return trx('user_address')
                         .where({
                             user_id:id
