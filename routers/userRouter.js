@@ -278,17 +278,25 @@ userRouter.post(
     })
 )
 
-userRouter.get(
+userRouter.post(
     '/auth/', 
-    userJwt, 
+    userJwt,
     expressAsyncHandler(async (req, res, next) => {
     try {
-        await db('user').where('id', req.user.id).select('*')
+        await db('user').where('id', req.user.id).select('token')
         .then(user => {
-            res.status(200).send({
-                success:true,
-                user:user
-            })
+            if(!user[0].token.localeCompare(req.body.token)){
+                res.status(200).send({
+                    success:true,
+                    message:"User authenticated!"
+                })
+            }else{
+                res.status(403).send({
+                    success:false,
+                    message:"User not authenticated!"
+                })
+            }
+            
         })
         .catch(err => {
             res.status(400).send({
@@ -302,7 +310,6 @@ userRouter.get(
             success:false,
             message:'Server error'
         })
-        next()
     }
 }))
 
