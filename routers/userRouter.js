@@ -279,38 +279,61 @@ userRouter.post(
 )
 
 userRouter.post(
-    '/auth/', 
-    userJwt,
+    '/auth/',
     expressAsyncHandler(async (req, res, next) => {
-    try {
-        await db('user').where('id', req.user.id).select('token')
-        .then(user => {
-            if(!user[0].token.localeCompare(req.body.token)){
-                res.status(200).send({
-                    success:true,
-                    message:"User authenticated!"
-                })
-            }else{
-                res.status(403).send({
-                    success:false,
-                    message:"User not authenticated!"
-                })
-            }
-            
-        })
-        .catch(err => {
-            res.status(400).send({
-                success:false,
-                message:'db error'
-                })
-        })
-        
-    } catch (error) {
-        res.status(500).send({
-            success:false,
-            message:'Server error'
-        })
-    }
+        const token = req.body.token;
+
+        if(!token){
+            return res.status(401).send({
+                message:'no token, unauthorised'
+            })
+        }
+        //save jwtsecret in .env
+        try {
+            await jwt.verify(token, "jwtsecret", async (err, decoded) => {
+                if(err){
+                    res.status(403).send({
+                        success:false,
+                        message:"User not authenticated!"
+                    })
+                } else{
+                    try {
+                        await db('user').where('id', decoded.user.id).select('token')
+                        .then(user => {
+                            if(user[0].token.localeCompare(token)){
+                                res.status(200).send({
+                                    success:true,
+                                    message:"User authenticated!"
+                                })
+                            }else{
+                                res.status(403).send({
+                                    success:false,
+                                    message:"User not authenticated!"
+                                })
+                            }
+
+                        })
+                        .catch(err => {
+                            res.status(400).send({
+                                success:false,
+                                message:'db error'
+                                })
+                        })
+                        
+                    } catch (error) {
+                        res.status(500).send({
+                            success:false,
+                            message:'Server error'
+                        })
+                    }
+                }
+            })
+        } catch (error) {
+            res.status(500).send({
+                message: 'server error'
+            })
+        }
+    
 }))
 
 userRouter.post(
