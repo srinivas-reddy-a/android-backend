@@ -60,10 +60,17 @@ productRouter.get(
                     .orWhere('category', 'like', `%${req.query.search}%`)
                     .orWhere('technical_name', 'like', `%${req.query.search}%`)
                 }
+                if(req.query.top){
+                    qb.where('top_product','=', true)
+                }
+                if(req.query.freq){
+                    qb.where('freq_bought', '=', true)
+                }
             })
             .limit(limit)
             .orderBy(orderby, order)
-            .then(products => {      
+            .then(products => {   
+                console.log(products.length)   
                 res.status(200).send({
                     success:true,
                     products:products
