@@ -9,6 +9,7 @@ import inventoryRouter from "./routers/inventoryRouter.js";
 import cropRouter from "./routers/cropRouter.js";
 import bugRouter from "./routers/bugRouter.js";
 import kycRouter from "./routers/kycRouter.js";
+import metaRouter from "./routers/metaRouter.js";
 
 import cors from "cors";
 import multer from "multer";
@@ -30,6 +31,8 @@ app.use('/api/inventory/', inventoryRouter);
 app.use('/api/crop/', cropRouter);
 app.use('/api/bug/', bugRouter);
 app.use('/api/kyc/', kycRouter);
+app.use('/api/meta/', metaRouter);
+
 
 app.use((err, req, res, next) => {
   if(err instanceof multer.MulterError){
