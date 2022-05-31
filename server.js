@@ -10,6 +10,7 @@ import cropRouter from "./routers/cropRouter.js";
 import bugRouter from "./routers/bugRouter.js";
 import kycRouter from "./routers/kycRouter.js";
 import metaRouter from "./routers/metaRouter.js";
+import techNameRouter from "./routers/techNameRouter.js";
 
 import cors from "cors";
 import multer from "multer";
@@ -32,7 +33,7 @@ app.use('/api/crop/', cropRouter);
 app.use('/api/bug/', bugRouter);
 app.use('/api/kyc/', kycRouter);
 app.use('/api/meta/', metaRouter);
-
+app.use('/api/techname/', techNameRouter);
 
 app.use((err, req, res, next) => {
   if(err instanceof multer.MulterError){
