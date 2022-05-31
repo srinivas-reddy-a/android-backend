@@ -32,7 +32,7 @@ techNameRouter.get(
     })
 )
 
-techNameRouter.get(
+techNameRouter.post(
     '/product/',
     userJwt,
     expressAsyncHandler(async (req, res) => {
