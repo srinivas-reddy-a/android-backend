@@ -38,7 +38,7 @@ techNameRouter.post(
     expressAsyncHandler(async (req, res) => {
         try {
             await db('product')
-            .where('technical_name', '=', `${req.body.technical_name}`)
+            .where('technical_name', '=', `${req.body.techname}`)
             .then(products => {
                 res.status(200).send({
                     success:true,
