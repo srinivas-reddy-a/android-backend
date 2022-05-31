@@ -33,7 +33,6 @@ metaRouter.get(
 
 metaRouter.get(
     '/review/',
-    userJwt,
     expressAsyncHandler(async (req, res) => {
         try {
             await db('meta_data')
