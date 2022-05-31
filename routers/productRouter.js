@@ -70,7 +70,6 @@ productRouter.get(
             .limit(limit)
             .orderBy(orderby, order)
             .then(products => {   
-                console.log(products.length)   
                 res.status(200).send({
                     success:true,
                     products:products
