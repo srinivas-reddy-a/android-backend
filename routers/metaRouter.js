@@ -31,4 +31,30 @@ metaRouter.get(
     })
 )
 
+metaRouter.get(
+    '/review/',
+    userJwt,
+    expressAsyncHandler(async (req, res) => {
+        try {
+            await db('meta_data')
+            .where('id','=',1)
+            .select('reviewimg','review','review_cus_name')
+            .then(reviews => {
+                res.status(200).send({
+                    success:true,
+                    reviews:reviews
+                })
+            }).catch(err => res.status(400).send({
+                success:false,
+                message:"db error"
+            }))
+        } catch (error) {
+            res.status(500).send({
+                success:false,
+                message:"server error"
+            })
+        }
+    })
+)
+
 export default metaRouter;
