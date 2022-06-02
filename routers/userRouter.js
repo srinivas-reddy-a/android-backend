@@ -128,8 +128,7 @@ userRouter.post(
                 try {
                     db.select('id')
                     .from('user')
-                    .orderBy('id', 'desc')
-                    .limit(1)
+                    .where('phone_number', '=', phoneNumber)
                     .then(async (id) => {
                         if(existingUser){
                             const payload = {
