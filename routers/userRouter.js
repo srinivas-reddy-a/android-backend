@@ -281,9 +281,8 @@ userRouter.post(
     '/auth/',
     expressAsyncHandler(async (req, res, next) => {
         const token = req.body.token;
-
         if(!token){
-            return res.status(401).send({
+            return res.status(403).send({
                 message:'no token, unauthorised'
             })
         }
@@ -299,7 +298,10 @@ userRouter.post(
                     try {
                         await db('user').where('id', decoded.user.id).select('token')
                         .then(user => {
-                            if(user[0].token.localeCompare(token)){
+                            // -1 if sorted before
+                            // 1 if sorted after
+                            // 0 if equal
+                            if(!user[0].token.localeCompare(token)){
                                 res.status(200).send({
                                     success:true,
                                     message:"User authenticated!"
