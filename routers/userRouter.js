@@ -123,84 +123,51 @@ userRouter.post(
     expressAsyncHandler(async (req, res) => {
         const { phoneNumber, otp, existingUser } = req.body;
         await axios.get(`https://api.msg91.com/api/v5/otp/verify?authkey=${authkey}&mobile=91${phoneNumber}&otp=${otp}`)
-        .then(response =>{
+        .then(async response =>{
             if(response.data.type==="success"){
                 try {
-                    db.select('id')
-                    .from('user')
-                    .where('phone_number', '=', phoneNumber)
-                    .then(async (id) => {
-                        if(existingUser){
-                            const payload = {
-                                user: {
-                                    id:id[0].id
+                    await db('user')
+                        .where('phone_number', phoneNumber)
+                        .then(async user => {
+                            if(user.length){
+                                const payload = {
+                                    user: {
+                                        id:user[0].id
+                                    }
                                 }
-                            }
-                            jwt.sign(payload, "jwtsecret", 
-                            async (err, token) => {
-                                if(err) throw err                               
-                                db('user')
-                                .where('phone_number', phoneNumber)
-                                .update({
-                                    'token':token,
-                                    'last_signed_in_at':new Date()
-                                })
-                                .then(user => {
-                                    res.status(200).send({
-                                        success: true,
-                                        token: token
+                                jwt.sign(payload, "jwtsecret", 
+                                async (err, token) => {
+                                    if(err) throw err        
+                                    await db('user')
+                                    .where('phone_number', phoneNumber)
+                                    .update({
+                                        'token':token,
+                                        'last_signed_in_at':new Date()
                                     })
-                                })
-                                .catch(err => {
-                                    res.status(400).send({
-                                        success: false,
-                                        message: "db error"
-                                    })
-                                })  
-                            })
-                        }else{
-                            //transaction not working as the children
-                            //of trx will be inside token async
-                            //function
-                            // await db.transaction(async trx => {
-                                await db('user')
-                                .where('phone_number', phoneNumber)
-                                .then(async user => {
-                                    if(user.length){
-                                        const payload = {
-                                            user: {
-                                                id:id[0].id
-                                            }
-                                        }
-                                        jwt.sign(payload, "jwtsecret", 
-                                        async (err, token) => {
-                                            if(err) throw err        
-                                            await db('user')
-                                            .where('phone_number', phoneNumber)
-                                            .update({
-                                                'token':token,
-                                                'last_signed_in_at':new Date()
-                                            })
-                                            .then(user => {
-                                                res.status(200).send({
-                                                    success: true,
-                                                    token: token
-                                                })
-                                            })
-                                            .catch(err => {
-                                                res.status(400).send({
-                                                    success: false,
-                                                    message: "db error"
-                                                })
-                                            }) 
+                                    .then(user => {
+                                        res.status(200).send({
+                                            success: true,
+                                            token: token
                                         })
-                                    }else{
-                                        const payload = {
-                                            user: {
-                                                id:id[0].id+1
-                                            }
+                                    })
+                                    .catch(err => {
+                                        res.status(400).send({
+                                            success: false,
+                                            message: "db error"
+                                        })
+                                    }) 
+                                })
+                            }else{
+                                await db('user')
+                                .select('id')
+                                .orderBy('id','desc')
+                                .then(id => {
+                                    const payload = {
+                                        user: {
+                                            id:id[0].id+1
                                         }
-                                        jwt.sign(payload, "jwtsecret", 
+                                    }
+                                    jwt.sign(payload, "jwtsecret", 
                                         async (err, token) => {
                                             if(err) throw err   
                                             await db('user')
@@ -222,18 +189,12 @@ userRouter.post(
                                                     })
                                                 })
                                         })
-                                    }
-                                })
-                            // })
-                              
-                        }
-                    })
-                    .catch(err => {
-                        res.status(400).send({
-                            success:false,
-                            message:'db error'
-                            })
-                    })
+                                    })
+                                        
+                                
+                            }
+                        })
+            
                 } catch (error) {
                     res.status(500).send({
                         success:false,
