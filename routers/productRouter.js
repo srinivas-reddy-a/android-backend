@@ -172,11 +172,13 @@ productRouter.get(
 productRouter.get(
     '/category/',
     expressAsyncHandler(async (req, res) => {
+        const limit = req.query.limit || 1000000;
         try {
             await db
             .select()
             .table('category')
             .orderBy('name', 'asc')
+            .limit(limit)
             .then(categories => {
                 res.status(200).send({
                     success:true,
