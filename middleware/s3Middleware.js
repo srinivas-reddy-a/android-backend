@@ -3,11 +3,11 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const s3Upload = (file) => {
+const s3Upload = (id, type, file) => {
     const s3 = new S3Client();
     const param = {
         Bucket: process.env.AWS_BUCKET_NAME,
-        Key: `kyc/${new Date()}-${file.originalname}`,
+        Key: `kyc/${id}/${type}-${file.originalname}`,
         Body: file.buffer,
     }
     return s3.send(new PutObjectCommand(param))

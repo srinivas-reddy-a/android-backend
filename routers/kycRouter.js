@@ -10,10 +10,6 @@ const kycRouter = express.Router();
 
 const bucketName = process.env.AWS_BUCKET_NAME;
 
-
-
-
-
 // const storage = multer({
 //     storage: multerS3({
 //         bucket: bucketName,
@@ -64,25 +60,82 @@ const storage = multer.memoryStorage();
 const upload = multer({ 
     storage, 
     fileFilter,
-    limits: { fileSize:100000, files:2 }
+    limits: { fileSize:1000000, files:2 }
  });
 
-kycRouter.post(
+//  upload.single - for one file
+//  upload.array - for multiple files
+
+kycRouter.put(
     '/',
     userJwt,
     upload.array("file"),
     expressAsyncHandler(async (req, res) => {     
-        const result = await s3Upload(req.files[0]);
-        res.status(200).send({
-            success:true,
-            // urls: files.map(({location, key, mimetype, size}) => ({
-            //     url: location,
-            //     name: key,
-            //     type: mimetype,
-            //     size: size
-            // }))
-            result
+        const {type, num, phoneNumber} = req.body;
+        await s3Upload(req.user.id, type, req.files[0])
+        .then(async (response) => {
+            if(response.$metadata.httpStatusCode==200){
+                if(!type.localeCompare("gst")){
+                    await db('user')
+                    .where('id',req.user.id)
+                    .update({
+                        gst:num,
+                        gsturl: `kyc/${req.user.id}/${type}-${req.files[0].originalname}`,
+                        modified_at: new Date()
+                    })
+                    .then((i) => {
+                        res.status(200).send({
+                            success: true,
+                            message: "Uploaded successfully."
+                        })
+                    }).catch(err => {
+                        res.status(400).send({
+                            success: false,
+                            message: "db error"
+                        })
+                    })
+                }else{
+                    await db('user')
+                    .where('id',req.user.id)
+                    .update({
+                        pan:num,
+                        panurl: `kyc/${req.user.id}/${type}-${req.files[0].originalname}`,
+                        modified_at: new Date()
+                    })
+                    .then((i) => {
+                        res.status(200).send({
+                            success: true,
+                            message: "Uploaded successfully."
+                        })
+                    }).catch(err => {
+                        res.status(400).send({
+                            success: false,
+                            message: "db error"
+                        })
+                    })
+                }
+            }else{
+                res.status(400).send({
+                    success: false,
+                    message:"s3 status error"
+                })
+            }
+        }).catch(err => {
+            res.status(400).send({
+                success: false,
+                message: "s3 error"
+            })
         })
+        // res.status(200).send({
+        //     success:true,
+        //     // urls: files.map(({location, key, mimetype, size}) => ({
+        //     //     url: location,
+        //     //     name: key,
+        //     //     type: mimetype,
+        //     //     size: size
+        //     // }))
+        //     result
+        // })
     })
 )
 

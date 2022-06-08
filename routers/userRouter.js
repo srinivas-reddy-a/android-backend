@@ -262,9 +262,6 @@ userRouter.post(
                             // -1 if sorted before
                             // 1 if sorted after
                             // 0 if equal
-                            console.log(token)
-                            console.log(decoded.user)
-                            console.log(user[0].token)
                             if(!user[0].token.localeCompare(token)){
                                 res.status(200).send({
                                     success:true,
