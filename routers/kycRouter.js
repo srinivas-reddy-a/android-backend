@@ -48,7 +48,7 @@ const bucketName = process.env.AWS_BUCKET_NAME;
 
 //file filter
 const fileFilter = (req, file, cb) => {
-    if(file.mimetype.split("/")[0] === "image"){
+    if(file.mimetype.split("/")[0] === "image" || file.mimetype.split("/")[0] === "application"){
         cb(null, true);
     }else{
         cb(new multer.MulterError("LIMIT_UNEXPECTED_FILE"), false);
@@ -60,7 +60,7 @@ const storage = multer.memoryStorage();
 const upload = multer({ 
     storage, 
     fileFilter,
-    limits: { fileSize:1000000, files:2 }
+    limits: { fileSize:10000000, files:2 }
  });
 
 //  upload.single - for one file
