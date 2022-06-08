@@ -71,7 +71,7 @@ kycRouter.put(
     userJwt,
     upload.array("file"),
     expressAsyncHandler(async (req, res) => {     
-        const {type, num, phoneNumber} = req.body;
+        const {type, num} = req.body;
         await s3Upload(req.user.id, type, req.files[0])
         .then(async (response) => {
             if(response.$metadata.httpStatusCode==200){
@@ -136,6 +136,11 @@ kycRouter.put(
         //     // }))
         //     result
         // })
+
+        res.status(500).send({
+            success:false,
+            message:"Internal Server Error"
+        })
     })
 )
 
