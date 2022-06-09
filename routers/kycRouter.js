@@ -60,7 +60,7 @@ const storage = multer.memoryStorage();
 const upload = multer({ 
     storage, 
     fileFilter,
-    limits: { fileSize:10000000, files:2 }
+    limits: { fileSize:10000000, files:1 }
  });
 
 //  upload.single - for one file
@@ -81,7 +81,7 @@ kycRouter.put(
                         .where('id',req.user.id)
                         .update({
                             gst:num,
-                            gsturl: `kyc/${req.user.id}/${type}-${req.files[0].originalname}`,
+                            gsturl: `kyc/${req.user.id}/${type}-${req.files[0].originalname}-${new Date()}`,
                             modified_at: new Date()
                         })
                         .then((i) => {
@@ -100,7 +100,7 @@ kycRouter.put(
                         .where('id',req.user.id)
                         .update({
                             pan:num,
-                            panurl: `kyc/${req.user.id}/${type}-${req.files[0].originalname}`,
+                            panurl: `kyc/${req.user.id}/${type}-${req.files[0].originalname}-${new Date()}`,
                             modified_at: new Date()
                         })
                         .then((i) => {
@@ -144,6 +144,109 @@ kycRouter.put(
                 message:"Internal Server Error"
             })
         }
+    })
+)
+
+
+
+kycRouter.put(
+    '/license/',
+    userJwt,
+    upload.array("file"),
+    expressAsyncHandler(async (req, res) => {     
+        const {type, date} = req.body;
+            try {
+                await s3Upload(req.user.id, type, req.files[0])
+                .then(async (response) => {
+                    if(response.$metadata.httpStatusCode==200){
+                        if(!type.localeCompare("pest")){
+                            await db('user')
+                                .where('id',req.user.id)
+                                .update({
+                                    pesticide_license_url : `kyc/${req.user.id}/${type}-${req.files[0].originalname}-${new Date()}`,
+                                    pesticide_license_expiry : date,
+                                    modified_at: new Date()
+                                })
+                                .then((i) => {
+                                    res.status(200).send({
+                                        success: true,
+                                        message: "Uploaded successfully."
+                                    })
+                                }).catch(err => {
+                                    res.status(400).send({
+                                        success: false,
+                                        message: "db error"
+                                    })
+                                })
+                        }else if(!type.localeCompare("fert")){
+                            await db('user')
+                                .where('id',req.user.id)
+                                .update({
+                                    fertilizer_license_url : `kyc/${req.user.id}/${type}-${req.files[0].originalname}-${new Date()}`,
+                                    fertilizer_license_expiry : date,
+                                    modified_at: new Date()
+                                })
+                                .then((i) => {
+                                    res.status(200).send({
+                                        success: true,
+                                        message: "Uploaded successfully."
+                                    })
+                                }).catch(err => {
+                                    res.status(400).send({
+                                        success: false,
+                                        message: "db error"
+                                    })
+                                })
+                            
+                        }else if(!type.localeCompare("seed")){
+                            await db('user')
+                                .where('id',req.user.id)
+                                .update({
+                                    seed_license_url : `kyc/${req.user.id}/${type}-${req.files[0].originalname}-${new Date()}`,
+                                    seed_license_expiry : date,
+                                    modified_at: new Date()
+                                })
+                                .then((i) => {
+                                    res.status(200).send({
+                                        success: true,
+                                        message: "Uploaded successfully."
+                                    })
+                                }).catch(err => {
+                                    res.status(400).send({
+                                        success: false,
+                                        message: "db error"
+                                    })
+                                })
+                        }
+                    }else{
+                        res.status(400).send({
+                            success: false,
+                            message:"s3 status error"
+                        })
+                    }
+                }).catch(err => {
+                    res.status(400).send({
+                        success: false,
+                        message: "s3 error"
+                    })
+                })
+                // res.status(200).send({
+                //     success:true,
+                //     // urls: files.map(({location, key, mimetype, size}) => ({
+                //     //     url: location,
+                //     //     name: key,
+                //     //     type: mimetype,
+                //     //     size: size
+                //     // }))
+                //     result
+                // })
+                
+            } catch (error) {
+                res.status(500).send({
+                    success:false,
+                    message:"Internal Server Error"
+                })
+            }     
     })
 )
 

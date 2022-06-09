@@ -7,7 +7,7 @@ const s3Upload = (id, type, file) => {
     const s3 = new S3Client();
     const param = {
         Bucket: process.env.AWS_BUCKET_NAME,
-        Key: `kyc/${id}/${type}-${file.originalname}`,
+        Key: `kyc/${id}/${type}-${file.originalname}-${new Date()}`,
         Body: file.buffer,
     }
     return s3.send(new PutObjectCommand(param))
