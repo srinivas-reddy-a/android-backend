@@ -165,7 +165,8 @@ kycRouter.put(
                                 .update({
                                     pesticide_license_url : `kyc/${req.user.id}/${type}-${req.files[0].originalname}-${new Date()}`,
                                     pesticide_license_expiry : date,
-                                    modified_at: new Date()
+                                    modified_at: new Date(),
+                                    kyc_status: "IR"
                                 })
                                 .then((i) => {
                                     res.status(200).send({
@@ -184,7 +185,8 @@ kycRouter.put(
                                 .update({
                                     fertilizer_license_url : `kyc/${req.user.id}/${type}-${req.files[0].originalname}-${new Date()}`,
                                     fertilizer_license_expiry : date,
-                                    modified_at: new Date()
+                                    modified_at: new Date(),
+                                    kyc_status: "IR"
                                 })
                                 .then((i) => {
                                     res.status(200).send({
@@ -204,7 +206,8 @@ kycRouter.put(
                                 .update({
                                     seed_license_url : `kyc/${req.user.id}/${type}-${req.files[0].originalname}-${new Date()}`,
                                     seed_license_expiry : date,
-                                    modified_at: new Date()
+                                    modified_at: new Date(),
+                                    kyc_status: "IR"
                                 })
                                 .then((i) => {
                                     res.status(200).send({
@@ -247,6 +250,35 @@ kycRouter.put(
                     message:"Internal Server Error"
                 })
             }     
+    })
+)
+
+
+kycRouter.get(
+    '/',
+    userJwt,
+    expressAsyncHandler(async (req, res) => {
+        try {
+            await db('user')
+            .where(id, req.user.id)
+            .select('kyc_status')
+            .then((kyc_status) => {
+                res.status(200).send({
+                    success:true,
+                    kyc_status: kyc_status
+                })
+            }).catch(err => {
+                res.status(400).send({
+                    success:false,
+                    message:"db error"
+                })
+            })
+        } catch (error) {
+            res.status(500).send({
+                success:false,
+                message:"Internal Server Error"
+            })
+        }
     })
 )
 
