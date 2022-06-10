@@ -265,7 +265,7 @@ kycRouter.get(
             .then((kyc_status) => {
                 res.status(200).send({
                     success:true,
-                    kyc_status: kyc_status
+                    kyc_status: kyc_status[0].kyc_status
                 })
             }).catch(err => {
                 res.status(400).send({
