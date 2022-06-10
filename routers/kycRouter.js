@@ -254,6 +254,7 @@ kycRouter.put(
 )
 
 
+//to know status of kyc
 kycRouter.get(
     '/',
     userJwt,
