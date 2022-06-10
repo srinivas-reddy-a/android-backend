@@ -82,7 +82,8 @@ kycRouter.put(
                         .update({
                             gst:num,
                             gsturl: `kyc/${req.user.id}/${type}-${req.files[0].originalname}-${new Date()}`,
-                            modified_at: new Date()
+                            modified_at: new Date(),
+                            kyc_status: "BP"
                         })
                         .then((i) => {
                             res.status(200).send({
