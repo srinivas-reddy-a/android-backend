@@ -260,7 +260,7 @@ kycRouter.get(
     expressAsyncHandler(async (req, res) => {
         try {
             await db('user')
-            .where(id, req.user.id)
+            .where('id', req.user.id)
             .select('kyc_status')
             .then((kyc_status) => {
                 res.status(200).send({
