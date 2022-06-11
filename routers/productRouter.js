@@ -21,7 +21,7 @@ productRouter.get(
     expressAsyncHandler(async (req, res) => {
         const limit = req.query.limit || 1000000;
         const orderby = req.query.orderby || 'name';
-        const order = req.query.order || 'desc';
+        const order = req.query.order || 'asc';
         try {
             await db('product')
             .where((qb)=>{
@@ -177,7 +177,7 @@ productRouter.get(
             await db
             .select()
             .table('category')
-            .orderBy('name', 'asc')
+            .orderBy('name', 'desc')
             .limit(limit)
             .then(categories => {
                 res.status(200).send({
