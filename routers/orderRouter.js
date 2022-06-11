@@ -5,9 +5,7 @@ import userJwt from "../middleware/userMiddleware.js";
 
 const orderRouter = express.Router();
 // var date = order[0].created_at;
-// console.log(date)
 //timestamp to date conversion
-// console.log(new Date(date.setDate(date.getDate()+4)))
 orderRouter.post(
     '/',
     userJwt,
