@@ -553,6 +553,8 @@ userRouter.post(
             postal_code,
             state,
             phone_number,
+            gst,
+            pan
         } = req.body;
         try {
             await db('user_address')
@@ -563,11 +565,14 @@ userRouter.post(
                 'postal_code':postal_code,
                 'phone_number':phone_number,
                 state,
-                city
+                city,
+                gst,
+                pan,
+                'kyc_status':'IR'
             }).then((address) => {
                 res.status(201).send({
                     success: true,
-                    message: "added new address",
+                    message: "Submitted Successfully!",
                 })
             }).catch(err => {
                 res.status(400).send({
@@ -597,7 +602,10 @@ userRouter.get(
                 'postal_code',
                 'phone_number',
                 'city',
-                'state'
+                'state',
+                'gst',
+                'pan',
+                'kyc_status'
             )
             .then(address => {
                 res.status(200).send({
@@ -672,6 +680,8 @@ userRouter.put(
                         address.postal_code = req.body.postal_code || address.postal_code;
                         address.state = req.body.state || address.state;
                         address.phone_number = req.body.phone_number || address.phone_number;
+                        address.gst = req.body.gst || address.gst;
+                        address.pan = req.body.pan || address.pan;
                         return trx('user_address')
                         .where({
                             user_id:id
@@ -682,6 +692,8 @@ userRouter.put(
                             'phone_number':address.phone_number,
                             'state':address.state,
                             'city':address.city,
+                            'gst':address.gst,
+                            'pan':address.pan
                         }).then((address)=>{
                             res.status(200).send({
                                 success:true,
