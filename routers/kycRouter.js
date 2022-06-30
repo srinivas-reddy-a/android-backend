@@ -262,8 +262,8 @@ kycRouter.get(
     userJwt,
     expressAsyncHandler(async (req, res) => {
         try {
-            await db('user')
-            .where('id', req.user.id)
+            await db('user_address')
+            .where('user_id', req.user.id)
             .select('kyc_status')
             .then((kyc_status) => {
                 res.status(200).send({
