@@ -265,6 +265,7 @@ kycRouter.get(
         try {
             // changed user table to user_address table 
             // coz kyc fragment has been set to address 
+            //table in database
             await db('user_address')
             .where('user_id', req.user.id)
             .select('kyc_status')
