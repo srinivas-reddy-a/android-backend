@@ -158,11 +158,12 @@ kycRouter.put(
     expressAsyncHandler(async (req, res) => {     
         const {type, date} = req.body;
             try {
+                console.log("transaction loading")
                 await s3Upload(req.user.id, type, req.files[0])
                 .then(async (response) => {
                     if(response.$metadata.httpStatusCode==200){
                         if(!type.localeCompare("pest")){
-                            await db('user')
+                            await db('user') 
                                 .where('id',req.user.id)
                                 .update({
                                     pesticide_license_url : `kyc/${req.user.id}/${type}-${req.files[0].originalname}-${new Date()}`,

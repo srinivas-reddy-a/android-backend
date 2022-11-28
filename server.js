@@ -8,9 +8,11 @@ import brandRouter from "./routers/brandRounter.js";
 import inventoryRouter from "./routers/inventoryRouter.js";
 import cropRouter from "./routers/cropRouter.js";
 import bugRouter from "./routers/bugRouter.js";
-import kycRouter from "./routers/kycRouter.js";
+// import kycRouter from "./routers/kycRouter.js";
 import metaRouter from "./routers/metaRouter.js";
 import techNameRouter from "./routers/techNameRouter.js";
+import rupifiRouter from "./routers/rupifiRouter.js";
+import firebaseRouter from "./routers/firebase.js";
 
 import cors from "cors";
 import multer from "multer";
@@ -31,9 +33,11 @@ app.use('/api/wishlist/', wishListRouter);
 app.use('/api/inventory/', inventoryRouter);
 app.use('/api/crop/', cropRouter);
 app.use('/api/bug/', bugRouter);
-app.use('/api/kyc/', kycRouter);
+// app.use('/api/kyc/', kycRouter);
 app.use('/api/meta/', metaRouter);
 app.use('/api/techname/', techNameRouter);
+app.use('/api/rupifi/', rupifiRouter); 
+app.use('/api/firebase/', firebaseRouter);
 
 app.use((err, req, res, next) => {
   if(err instanceof multer.MulterError){

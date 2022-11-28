@@ -2,8 +2,17 @@ import express from "express";
 import expressAsyncHandler from "express-async-handler";
 import db from "../config/database.js";
 import userJwt from "../middleware/userMiddleware.js";
+import dotenv from 'dotenv';
+import Razorpay from 'razorpay';
+import hmacSHA512 from 'crypto-js/hmac-sha512.js';
+import Base64 from 'crypto-js/enc-base64.js';
+import crypto from 'crypto';
+
+dotenv.config()
 
 const orderRouter = express.Router();
+
+
 // var date = order[0].created_at;
 //timestamp to date conversion
 orderRouter.post(
@@ -12,23 +21,34 @@ orderRouter.post(
     expressAsyncHandler(async (req,res) => {
         const {
             total,
+            savings,
             address_id,
+            payment_type,
+            is_paid,
+            razorpay_payment_id,
+            razorpay_order_id,
+            razorpay_signature
         } = req.body;
         
         try {
-            const date = new Date();
-            const dDate = new Date(date.setDate(date.getDate()+4))
+            
             await db('order')
             .insert({
                 'user_id': req.user.id,
-                'created_at':new Date(),
-                'delivery_date':dDate,
                 address_id,
-                total
+                total,
+                savings,
+                payment_type,
+                is_paid,
+                razorpay_payment_id,
+                razorpay_order_id,
+                razorpay_signature,
+                'created_at':new Date(),
+                'modified_at':new Date(),
             }).then(order => {
                 res.status(201).send({
                     success:true,
-                    message:order[0]
+                    message:"Order Placed Successfully!"
                 })
             }).catch(err => {
                 res.status(400).send({
@@ -49,38 +69,54 @@ orderRouter.post(
 orderRouter.post(
     '/detail/',
     expressAsyncHandler(async (req, res) => {
-        const {
-            order_id,
-            product_id,
-            quantity,
-            volume
-        } = req.body
-        try {
-            await db('order_details')
-            .insert({
-                order_id,
-                'products_id':product_id,
-                quantity,
-                'created_at':new Date(),
-                volume:volume
-            }).then(orderDetail => {
-                res.status(201).send({
-                    success:true,
-                    orderDetail:orderDetail,
-                    message:"order placed"
-                })
-            }).catch(err => {
-                res.status(400).send({
-                    success:false,
-                    message:'db error'
-                    })
-            })
-        } catch (error) {
-            res.status(500).send({
-                success:false,
-                message:'user not found db error'
-            })
+        const {razorpay_payment_id, razorpay_signature} = req.body;
+        const hmac = crypto.createHmac('sha256', process.env.RZP_KEY_SECRET);
+        hmac.update("order_KHfxEaEmh9MnM5" + "|" + razorpay_payment_id);
+        let generated_signature = hmac.digest('hex');
+        if (generated_signature == razorpay_signature) {
+            console.log("payment is successful");
+        }else{
+            console.log("not verified");
         }
+        // const {
+        //     order_id,
+        //     product_id,
+        //     quantity,
+        //     volume,
+        //     price,
+        //     discount
+        // } = req.body
+        // try {
+        //     const date = new Date();
+        //     const dDate = new Date(date.setDate(date.getDate()+1))
+        //     await db('order_details')
+        //     .insert({
+        //         order_id,
+        //         'products_id':product_id,
+        //         quantity,
+        //         'created_at':new Date(),
+        //         'modified_at':new Date(),
+        //         'delivery_date':dDate,
+        //         volume,
+        //         price,
+        //         discount
+        //     }).then(orderDetail => {
+        //         res.status(201).send({
+        //             success:true,
+        //             message:"Order Placed Successfully"
+        //         })
+        //     }).catch(err => {
+        //         res.status(400).send({
+        //             success:false,
+        //             message:'db error'
+        //             })
+        //     })
+        // } catch (error) {
+        //     res.status(500).send({
+        //         success:false,
+        //         message:'user not found db error'
+        //     })
+        // }
     })
 )
 
@@ -166,37 +202,34 @@ orderRouter.get(
                                 orderDetails.forEach(orderDetails => {
                                     orderDetails.user_id=order.user_id;
                                     orderDetails.total = order.total;
-                                    orderDetails.delivery_type = order.delivery_type
-                                    orderDetails.delivery_date = order.delivery_date
-                                    orderDetails.is_delivered = order.is_delivered;
-                                    orderDetails.is_shipped = order.is_shipped;
-                                    orderDetails.delivered_on = order.delivered_on;
-                                    orderDetails.address_id = order.address_id
+                                    orderDetails.address_id = order.address_id;
+                                    orderDetails.payment_type = order.payment_type;
+                                    orderDetails.is_paid = order.is_paid;
                                 })
                                 return orderDetails
                             }).catch(err => {
                                 res.status(400).send({
                                     success:false,
                                     message:'db error'
-                                    })
+                                })
                             })
                         });
                         const products = await Promise.all(promises)
                         res.status(200).send({
                             success:true,
-                            products:Array.prototype.concat.apply([],products)
+                            allorders:Array.prototype.concat.apply([],products)
                         })
                     }else{
                         res.status(400).send({
                             success:false,
-                            message: "WishList empty!"
+                            message: "No Orders Found!"
                         })
                     }
                 }).catch(err => {
                     res.status(400).send({
                         success:false,
                         message:'db error'
-                        })
+                    })
                 })
             })
         } catch (error) {
@@ -207,6 +240,7 @@ orderRouter.get(
         }
     })
 )
+
 
 // to delete order after collecting package
 // orderRouter.delete(
@@ -253,6 +287,8 @@ orderRouter.get(
 // )
 
 //request for cancellation
+
+
 orderRouter.put(
     '/cancel/req/',
     userJwt,
@@ -366,5 +402,43 @@ orderRouter.get(
 //         })
 //     })
 // )
+
+orderRouter.post(
+    '/razorpay/order/',
+    userJwt,
+    expressAsyncHandler(async (req, res) => {
+        var instance = new Razorpay({ key_id: process.env.RZP_KEY_ID, key_secret: process.env.RZP_KEY_SECRET })
+        var {amount , receipt_id} = req.body;
+        var {note} = req.body || "Creating Order";
+
+        try {
+            instance.orders.create({
+                amount: amount,
+                currency: "INR",
+                receipt: receipt_id,
+                notes: {
+                    note1:note
+                }
+
+                }).then(order => {
+                    res.status(200).send({
+                        success:true,
+                        rp_order: order
+                    })        
+                }).catch(err => {
+                    res.status(400).send({
+                        success:false,
+                        message:"check fields"
+                    })
+                })    
+        } catch (error) {
+            res.status(500).send({
+                success:false,
+                message:'server error'
+            })
+        }
+        
+    })
+)
 
 export default orderRouter;
